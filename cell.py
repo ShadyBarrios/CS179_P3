@@ -13,7 +13,7 @@ StyleBackgroundDict = {
 }
 
 class Cell:
-    base_stylesheet = "padding:12px; border: 1px solid black; color:black;"
+    base_stylesheet = "padding:27px; border: 1px solid black; color:black;"
     def __init__(self, label:QtWidgets.QLabel, type:CellTypes, value:str=''):
         self.label = label
         self.type = type

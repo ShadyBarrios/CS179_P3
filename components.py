@@ -16,7 +16,6 @@ class Components:
         file_name = file[0]
 
     def init_ShipGrid(self):
-        print("init ship grid")
         grid = []
         for row in range(self.row_count):
             gridRow = []
@@ -24,7 +23,7 @@ class Components:
                 label = QtWidgets.QLabel()
                 text = f"[{row},{col}]"
                 label.setText(text)
-                style = "padding:12px; border: 1px solid black; text-color:black;"
+                style = "padding:27px; border: 1px solid black; color:black;"
                 label.setStyleSheet(style)
 
                 self.ui.ShipGrid.addWidget(label, row, col)
