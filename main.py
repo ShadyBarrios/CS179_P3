@@ -9,7 +9,7 @@ def main():
     app = QApplication(sys.argv)
     widget = MainWindow()
     components = Components(widget.ui)
-    widget.ui.FilePickButton.clicked.connect(components.on_file_pick_click)
+    components.init_ShipGrid()
     widget.show()
     sys.exit(app.exec())
 

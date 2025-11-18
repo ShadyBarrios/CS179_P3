@@ -2,6 +2,9 @@ from PySide6 import QtWidgets
 from main_window import *
 
 class Components:
+    row_count:int = 8
+    col_count:int = 12
+
     def __init__(self, ui:Ui_MainWindow):
         self.ui = ui
 
@@ -9,11 +12,12 @@ class Components:
         file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a txt file", None, "Text Files (*.txt)")
         file_name = file[0]
 
-        CommsLabel = self.ui.CommunicatorLabel
-
-        if file_name == '':
-            print("No file selected")
-            CommsLabel.setText("You didn't pick a file! Try again.")
-        else:
-            print(f"File picked {file_name}")
-            CommsLabel.setText(f"You picked {file_name}")
+    def init_ShipGrid(self):
+        print("print")
+        for row in range(self.row_count):
+            for col in range(self.col_count):
+                label = QtWidgets.QLabel()
+                label.setText(f"[{row},{col}]")
+                label.setStyleSheet("padding:10px; border: 1px solid black;")
+                self.ui.ShipGrid.addWidget(label, row, col)
+                item = self.ui.ShipGrid.itemAtPosition(row, col)
