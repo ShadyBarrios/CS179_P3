@@ -1,7 +1,10 @@
 from PySide6 import QtWidgets
 from main_window import *
+from grid import Grid
+from cell import Cell, CellTypes
 
 class Components:
+    grid:Grid = None
     row_count:int = 8
     col_count:int = 12
 
@@ -13,11 +16,21 @@ class Components:
         file_name = file[0]
 
     def init_ShipGrid(self):
-        print("print")
+        print("init ship grid")
+        grid = []
         for row in range(self.row_count):
+            gridRow = []
             for col in range(self.col_count):
                 label = QtWidgets.QLabel()
-                label.setText(f"[{row},{col}]")
-                label.setStyleSheet("padding:10px; border: 1px solid black;")
+                text = f"[{row},{col}]"
+                label.setText(text)
+                style = "padding:12px; border: 1px solid black; text-color:black;"
+                label.setStyleSheet(style)
+
                 self.ui.ShipGrid.addWidget(label, row, col)
-                item = self.ui.ShipGrid.itemAtPosition(row, col)
+
+                cell = Cell(label, CellTypes.UNUSED, text)
+
+                gridRow.append(cell)
+            grid.append(gridRow)
+                
