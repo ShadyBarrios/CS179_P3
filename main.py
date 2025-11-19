@@ -9,7 +9,7 @@ def main():
     app = QApplication(sys.argv)
     widget = MainWindow()
     components = Components(widget.ui)
-    components.init_ShipGrid()
+    components.hide_all(components.ui.FilePickLayout)
     widget.show()
     sys.exit(app.exec())
 

@@ -43,10 +43,3 @@ class Grid:
                 self.grid[row_count][col_count].setType(type)
                 self.grid[row_count][col_count].setValue(value)
                 self.grid[row_count][col_count].updateText()
-
-                
-
-
-
-
-    

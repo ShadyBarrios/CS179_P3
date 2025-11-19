@@ -1,5 +1,5 @@
-from PySide6 import QtWidgets
 from main_window import *
+from utils import *
 from grid import Grid
 from cell import Cell, CellTypes
 
@@ -12,8 +12,17 @@ class Components:
         self.ui = ui
 
     def on_file_pick_click(self):
-        file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a txt file", None, "Text Files (*.txt)")
+        file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a manifest txt file", None, "Text Files (*.txt)")
         file_name = file[0]
+
+    def hide_all(self, parentLayout:QtWidgets.QLayout):
+        childItems:list[QtWidgets.QWidget] = []
+        num_children = parentLayout.count()
+        for child_idx in range(num_children):
+            childItems.extend(get_all_children_items(parentLayout.itemAt(child_idx)))
+        
+        for item in childItems:
+            item.setVisible(False)
 
     def init_ShipGrid(self):
         grid = []
