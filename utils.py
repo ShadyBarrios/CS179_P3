@@ -5,13 +5,13 @@ from enum import Enum
 from manifest_item import ManifestItem
 from coordinate import Coordinate
 
-class ErrorTypes(Enum):
+class ParseErrorTypes(Enum):
     FileNotFound = 1
     IncorrectFileType = 2
     IncorrectFileFormatting = 3
     IncorrectManifestLength = 4
 
-def parse_file(file_name) -> list[ManifestItem] | ErrorTypes:
+def parse_file(file_name) -> list[ManifestItem] | ParseErrorTypes:
     x_format = "0[1-8]"
     y_format = "0[1-9]|1[0-2]"
     weight_format = "[0-9]{5}"
@@ -26,7 +26,7 @@ def parse_file(file_name) -> list[ManifestItem] | ErrorTypes:
 
     if file_name[-4:] != ".txt":
         print("ERROR: File must be .txt type.")
-        return ErrorTypes.IncorrectFileType
+        return ParseErrorTypes.IncorrectFileType
 
     current_row = 1
     current_col = 1
@@ -42,7 +42,7 @@ def parse_file(file_name) -> list[ManifestItem] | ErrorTypes:
                 if line == "":
                     break
 
-                proper_format:bool = not (re.search(expected_format, line) is None)
+                proper_format = not(re.search(expected_format, line) is None)
 
                 if proper_format:
                     sections = line.split(", ")
@@ -51,32 +51,36 @@ def parse_file(file_name) -> list[ManifestItem] | ErrorTypes:
                     title_str = sections[2]
 
                     coordinate_str_parts = coordinate_str.split(",")
-                    x_coordinate = int(re.findall(x_format, coordinate_str_parts[0])[0])
-                    y_coordinate = int(re.findall(y_format, coordinate_str_parts[1])[0])
+                    row_coordinate = int(re.findall(x_format, coordinate_str_parts[0])[0])
+                    col_coordinate = int(re.findall(y_format, coordinate_str_parts[1])[0])
 
-                    if x_coordinate != current_col:
-                        return ErrorTypes.IncorrectFileFormatting
-                    if y_coordinate != current_row:
-                        return ErrorTypes.IncorrectFileFormatting
+                    if col_coordinate != current_col:
+                        return ParseErrorTypes.IncorrectFileFormatting
+                    if row_coordinate != current_row:
+                        return ParseErrorTypes.IncorrectFileFormatting
 
-                    coordinate = Coordinate(x_coordinate, y_coordinate)
-                    current_row += 1
+                    coordinate = Coordinate(row_coordinate, col_coordinate)
+
                     current_col += 1
+
+                    if current_col == 13:
+                        current_col = 1
+                        current_row += 1
 
                     weight = int(re.findall(weight_format, weight_str)[0])
 
                     items.append(ManifestItem(coordinate, weight, title_str))
                     item_count += 1
                 else:
-                    return ErrorTypes.IncorrectFileFormatting
+                    return ParseErrorTypes.IncorrectFileFormatting
                 
             if item_count != 96:
-                return ErrorTypes.IncorrectManifestLength
+                return ParseErrorTypes.IncorrectManifestLength
                 
             return items
     except FileNotFoundError:
         print("ERROR: FILE NOT FOUND")
-        return ErrorTypes.FileNotFound
+        return ParseErrorTypes.FileNotFound
     
 def get_all_children_items(item) -> list[QtWidgets.QWidget]:
     children = []

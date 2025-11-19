@@ -11,9 +11,34 @@ class Components:
     def __init__(self, ui:Ui_MainWindow):
         self.ui = ui
 
-    def on_file_pick_click(self):
+    def pick_file(self):
         file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a manifest txt file", None, "Text Files (*.txt)")
         file_name = file[0]
+
+        if file_name == '':
+            self.ui.FilePickLabel.setText("File not picked. Try again.")
+            return
+
+        grid_parse = parse_file(file_name)
+
+        if isinstance(grid_parse, ParseErrorTypes):
+            match grid_parse:
+                case ParseErrorTypes.FileNotFound:
+                    self.ui.FilePickLabel.setText("ERROR: File not found. Try again.")
+                    return
+                case ParseErrorTypes.IncorrectFileType:
+                    self.ui.FilePickLabel.setText("ERROR: Must pick .txt file. Try again.")
+                    return
+                case ParseErrorTypes.IncorrectFileFormatting:
+                    self.ui.FilePickLabel.setText("Error: File is not formatted properly. Try again.")
+                    return
+                case ParseErrorTypes.IncorrectManifestLength:
+                    self.ui.FilePickLabel.setText("Error: Manifest does not match expected length (n = 96). Try again.")
+                    return
+        
+        for item in grid_parse:
+            print(item)
+        return 
 
     def hide_all(self, parentLayout:QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = []

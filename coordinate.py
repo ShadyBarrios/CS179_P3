@@ -1,14 +1,14 @@
 import math
 
 class Coordinate:
-    def __init__(self, x:int, y:int):
-        self.loc = (x, y)
+    def __init__(self, row:int, col:int):
+        self.loc = (row, col)
     
-    def get_x(self) -> int:
+    def get_row(self) -> int:
         return self.loc[0]
 
-    def get_y(self) -> int:
+    def get_col(self) -> int:
         return self.loc[1]
     
     def __eq__(self, rhs):
-        return (self.get_x() == rhs.get_x()) and (self.get_y() == rhs.get_y())
+        return (self.get_row() == rhs.get_row()) and (self.get_col() == rhs.get_col())

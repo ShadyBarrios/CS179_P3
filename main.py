@@ -9,7 +9,7 @@ def main():
     app = QApplication(sys.argv)
     widget = MainWindow()
     components = Components(widget.ui)
-    components.hide_all(components.ui.FilePickLayout)
+    components.ui.FilePickButton.clicked.connect(components.pick_file)
     widget.show()
     sys.exit(app.exec())
 
