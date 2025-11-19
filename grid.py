@@ -1,5 +1,6 @@
 from PySide6 import QtWidgets
 from cell import Cell, CellTypes
+from manifest import ManifestItem
 
 class Grid:
     def __init__(self, grid:list[list[Cell]], row_count=8, col_count=12):
@@ -16,7 +17,7 @@ class Grid:
 
         self.grid = grid
                 
-    def update(self, new_grid:list[list]):
+    def update(self, new_grid:list[list[ManifestItem]]):
         row_count = len(new_grid)
         col_count = len(new_grid[0])
 

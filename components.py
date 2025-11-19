@@ -3,10 +3,15 @@ from utils import *
 from grid import Grid
 from cell import Cell, CellTypes
 
+class States(Enum):
+    init_grid = 1
+    show_init = 2
+    end = 3
+
 class Components:
     grid:Grid = None
-    row_count:int = 8
     col_count:int = 12
+    row_count:int = 8
 
     def __init__(self, ui:Ui_MainWindow):
         self.ui = ui
@@ -36,34 +41,43 @@ class Components:
                     self.ui.FilePickLabel.setText("Error: Manifest does not match expected length (n = 96). Try again.")
                     return
         
-        for item in grid_parse:
-            print(item)
+        self.begin(grid_parse)
         return 
 
+    def begin(self, grid_parse:list[ManifestItem]):
+        self.hide_all(self.ui.FilePickLayout)
+        self.init_ShipGrid(grid_parse)
+        self.show_all(self.ui.ShipGridLayout)
+
     def hide_all(self, parentLayout:QtWidgets.QLayout):
-        childItems:list[QtWidgets.QWidget] = []
-        num_children = parentLayout.count()
-        for child_idx in range(num_children):
-            childItems.extend(get_all_children_items(parentLayout.itemAt(child_idx)))
+        childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
         
         for item in childItems:
             item.setVisible(False)
+        
+    def show_all(self, parentLayout:QtWidgets.QLayout):
+        childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
 
-    def init_ShipGrid(self):
+        for item in childItems:
+            item.setVisible(True) 
+
+    def init_ShipGrid(self, grid_parse:list[ManifestItem]):
         grid = []
         for row in range(self.row_count):
             gridRow = []
             for col in range(self.col_count):
+                item = grid_parse[(row*(self.col_count) + col)]
+
                 label = QtWidgets.QLabel()
-                text = f"[{row},{col}]"
+                text = item.get_title_for_display()
                 label.setText(text)
-                style = "padding:27px; border: 1px solid black; color:black;"
-                label.setStyleSheet(style)
 
-                self.ui.ShipGrid.addWidget(label, row, col)
+                self.ui.ShipGrid.addWidget(label, item.get_row_for_display(), item.get_col())
 
-                cell = Cell(label, CellTypes.UNUSED, text)
+                cell = Cell(label, item)
+
+                style = cell.generateStyle()
+                cell.setStyle(style)
 
                 gridRow.append(cell)
             grid.append(gridRow)
-                

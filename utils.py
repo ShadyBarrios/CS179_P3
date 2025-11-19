@@ -2,7 +2,7 @@ import re
 import os
 from PySide6 import QtWidgets
 from enum import Enum
-from manifest_item import ManifestItem
+from manifest import ManifestItem
 from coordinate import Coordinate
 
 class ParseErrorTypes(Enum):
@@ -69,7 +69,8 @@ def parse_file(file_name) -> list[ManifestItem] | ParseErrorTypes:
 
                     weight = int(re.findall(weight_format, weight_str)[0])
 
-                    items.append(ManifestItem(coordinate, weight, title_str))
+                    title = title_str.strip()
+                    items.append(ManifestItem(coordinate, weight, title))
                     item_count += 1
                 else:
                     return ParseErrorTypes.IncorrectFileFormatting
@@ -85,13 +86,14 @@ def parse_file(file_name) -> list[ManifestItem] | ParseErrorTypes:
 def get_all_children_items(item) -> list[QtWidgets.QWidget]:
     children = []
 
-    itemIsWidget = isinstance(item, QtWidgets.QWidgetItem)
-    itemIsLayout = isinstance(item, QtWidgets.QLayoutItem)
+    itemIsWidgetItem = isinstance(item, QtWidgets.QWidgetItem)
+    itemIsLayoutItem = isinstance(item, QtWidgets.QLayoutItem)
+    itemIsLayout = isinstance(item, QtWidgets.QLayout)
     
-    if itemIsWidget:
+    if itemIsWidgetItem:
         item = item.widget()
         return [item]
-    elif itemIsLayout and itemIsWidget:
+    elif (itemIsLayoutItem and itemIsWidgetItem) or itemIsLayout:
         child_count = item.count()
 
         for child_idx in range(child_count):
