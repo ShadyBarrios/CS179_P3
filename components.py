@@ -10,6 +10,11 @@ class States(Enum):
     show_init = 2
     end = 3
 
+class Pages(Enum):
+    ShipGridPage = 0
+    FilePickPage = 1
+    ErrorPage = 2
+
 class Components:
     grid:Grid = None
     col_count:int = 12
@@ -17,12 +22,8 @@ class Components:
 
     def __init__(self, ui:Ui_MainWindow):
         self.ui = ui
-
-        layouts_to_hide = [self.ui.ErrorLayout, self.ui.ShipGridLayout]
-        for layout in layouts_to_hide:
-            self.hide_all(layout)
-        
-        self.show_all(self.ui.FilePickLayout)
+        self.src_file_name = None
+        self.set_page(Pages.FilePickPage)
         
 
     def pick_file(self):
@@ -50,12 +51,16 @@ class Components:
                     self.throw_error("Error: Manifest does not match expected length (n = 96). Try again.")
                     return
         
+        self.src_file_name = file_name
         self.begin(grid_parse)
         return 
 
     def begin(self, grid_parse:list[ManifestItem]):
-        self.hide_all(self.ui.FilePickLayout)
+        self.set_page(Pages.ShipGridPage)
+        self.hide_all(self.ui.MessageLayouts)
         self.init_ShipGrid(grid_parse)
+        num_used_cells = self.get_grid().get_num_used_cells()
+        self.display_parse_results(self.get_grid(), num_used_cells, self.get_src_file_name())
         self.show_all(self.ui.ShipGridLayout)
 
     def hide_all(self, parentLayout:QtWidgets.QLayout):
@@ -69,24 +74,17 @@ class Components:
 
         for item in childItems:
             item.setVisible(True)
+        
+    def set_page(self, page:Pages):
+        self.ui.AllPages.setCurrentIndex(page.value)
 
     def throw_error(self, errorMsg:str):
-        layouts_to_hide = [self.ui.FilePickLayout, self.ui.ShipGridLayout]
-        
-        for layout in layouts_to_hide:
-            self.hide_all(layout)
-        
-        self.show_all(self.ui.ErrorLayout)
+        self.set_page(Pages.ErrorPage)
         self.ui.ErrorLabel.setText(errorMsg)
         self.ui.ErrorLabel.setStyleSheet("color:red")
     
     def restart(self):
-        layouts_to_hide = [self.ui.ErrorLayout, self.ui.ShipGridLayout]
-
-        for layout in layouts_to_hide:
-            self.hide_all(layout)
-
-        self.show_all(self.ui.FilePickLayout)
+        self.set_page(Pages.FilePickPage)
 
     def init_ShipGrid(self, grid_parse:list[ManifestItem]):
         grid:list[list[Cell]] = []
@@ -112,3 +110,19 @@ class Components:
         self.grid = Grid(grid, self.row_count, self.col_count)
         if not self.grid.valid_grid():
             self.throw_error("ERROR: Item layout is not physically possible! Try again with a new file.")
+    
+    def display_parse_results(self, grid:Grid, num_used_cells:int, src_file_name:str):
+        root_name = get_file_root_name(src_file_name)
+        message = f"{root_name} has {num_used_cells} containers\nComputing a solution..."
+        self.display_message(message)
+        self.show_all(self.ui.MessageLhsLayout)
+
+
+    def display_message(self, message:str):
+        self.ui.MessageLhsLabel.setText(message)
+
+    def get_grid(self) -> Grid:
+        return self.grid
+
+    def get_src_file_name(self) -> str:
+        return self.src_file_name

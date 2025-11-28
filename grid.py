@@ -25,6 +25,15 @@ class Grid:
 
     def get_grid(self) -> list[list[Cell]]:
         return self.grid
+    
+    def get_num_used_cells(self):
+        used_count = 0
+        grid = self.grid
+        for row in grid:
+            for item in row:
+                used_count += int(item.get_type() == CellTypes.USED)
+        
+        return used_count
 
     # will check if layout is physically possible (no floating items)
     def valid_grid(self) -> bool:

@@ -2,6 +2,7 @@ from PySide6 import QtWidgets
 from manifest import ManifestItem
 from enum import Enum
 from cell import CellTypes
+from pathlib import Path
     
 def get_all_children_items(item) -> list[QtWidgets.QWidget]:
     children = []
@@ -23,5 +24,6 @@ def get_all_children_items(item) -> list[QtWidgets.QWidget]:
         return []
 
 
-    
+def get_file_root_name(file_name:str) -> str:
+    return Path(file_name).stem
     
