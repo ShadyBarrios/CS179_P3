@@ -109,7 +109,7 @@ class Components:
 
         self.grid = Grid(grid, self.row_count, self.col_count)
         if not self.grid.valid_grid():
-            self.throw_error("ERROR: Item layout is not physically possible! Try again with a new file.")
+            self.throw_error("ERROR: Ship layout is not allowed (asymmetric or floating objects)! Try again with a new file.")
     
     def display_parse_results(self, grid:Grid, num_used_cells:int, src_file_name:str):
         root_name = get_file_root_name(src_file_name)

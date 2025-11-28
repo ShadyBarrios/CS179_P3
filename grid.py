@@ -1,6 +1,7 @@
 from PySide6 import QtWidgets
 from cell import Cell, CellTypes
 from manifest import ManifestItem
+from utils import get_sides
 
 class Grid:
     def __init__(self, grid:list[list[Cell]], row_count=8, col_count=12):
@@ -35,22 +36,41 @@ class Grid:
         
         return used_count
 
-    # will check if layout is physically possible (no floating items)
+    # will check if layout is legal (no floating cells and must be symmetric)
     def valid_grid(self) -> bool:
-        grid = self.get_grid()
-        rows = self.get_row_count()
-        cols = self.get_col_count()
+        return self.is_symmetric() and self.is_physically_possible()
 
-        for row in range(1,rows):
-            for col in range(cols):
-                item = grid[row][col]
-                if item.get_type() == CellTypes.USED:
-                    item_below = grid[row-1][col]
-                    if item_below.get_type() != CellTypes.USED:
+    # NAN layout must be mirror across port and starboard side
+    def is_symmetric(self) -> bool:
+        port_side, starboard_side = get_sides(self.get_grid())
+        port_side_NANs = [] # FALSE not NAN, TRUE is NAN
+        starboard_side_NANs = [] # FALSE not NAN, TRUE is NAN
+
+        for row in port_side:
+            row.reverse()
+            for item in row:
+                port_side_NANs.append(item.get_type() == CellTypes.NAN)
+
+        for row in starboard_side:
+            for item in row:
+                starboard_side_NANs.append(item.get_type() == CellTypes.NAN)
+
+        return port_side_NANs == starboard_side_NANs
+
+    # no floating objects (USED ontop of UNUSED)
+    def is_physically_possible(self) -> bool:
+        row_count = self.get_row_count()
+        col_count = self.get_col_count()
+        grid = self.get_grid()
+
+        for row in range(1,row_count):
+            for col in range(col_count):
+                if grid[row][col].get_type() == CellTypes.USED:
+                    if grid[row-1][col].get_type() == CellTypes.UNUSED:
                         return False
-        
+
         return True
-                
+
     def update(self, new_grid:list[ManifestItem]):
         row_count = self.get_row_count()
         col_count = self.get_col_count()
