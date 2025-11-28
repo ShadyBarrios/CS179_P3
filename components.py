@@ -80,7 +80,6 @@ class Components:
         self.ui.ErrorLabel.setText(errorMsg)
         self.ui.ErrorLabel.setStyleSheet("color:red")
     
-    #TODO: create "Restart" function that depends on button press
     def restart(self):
         layouts_to_hide = [self.ui.ErrorLayout, self.ui.ShipGridLayout]
 

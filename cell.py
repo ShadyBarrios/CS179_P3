@@ -9,6 +9,15 @@ class CellTypes(Enum):
     TARGET = 4
     SOURCE = 5
 
+    
+    def to_type(title:str):
+        if title== "NAN":
+            return CellTypes.NAN
+        elif title == "UNUSED":
+            return CellTypes.UNUSED
+        else:
+            return CellTypes.USED
+        
 StyleBackgroundDict = {
     CellTypes.NAN: "background-color:BLACK; color:BLACK;",
     CellTypes.UNUSED: "background-color:WHITE; color:WHITE;",
@@ -25,19 +34,16 @@ class Cell:
     def __init__(self, label:QtWidgets.QLabel, item:ManifestItem):
         self.label = label
         self.item = item
-
-        if item.get_title() == "NAN":
-            self.type = CellTypes.NAN
-        elif item.get_title() == "UNUSED":
-            self.type = CellTypes.UNUSED
-        else:
-            self.type = CellTypes.USED
+        self.type = CellTypes.to_type(item.get_title())
 
         self.style = self.base_stylesheet + StyleBackgroundDict[self.type]
         self.label.setStyleSheet(self.style)
 
-    def get_type(self):
+    def get_type(self) -> CellTypes:
         return self.type
+
+    def set_item(self, item:ManifestItem):
+        self.item = item
 
     def set_value(self, value:str):
         self.value = value

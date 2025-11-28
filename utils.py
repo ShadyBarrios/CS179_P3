@@ -1,5 +1,7 @@
 from PySide6 import QtWidgets
 from manifest import ManifestItem
+from enum import Enum
+from cell import CellTypes
     
 def get_all_children_items(item) -> list[QtWidgets.QWidget]:
     children = []

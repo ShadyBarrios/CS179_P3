@@ -16,8 +16,14 @@ class ManifestItem:
         else:
             self.position = ItemPosition.STARBOARD
 
+    # only the coordinate and weight matter for matching, no difference in state if title is different
     def __eq__(self, rhs) -> int:
-        return self.coordinate == rhs.coordinate
+        if not isinstance(rhs, ManifestItem):
+            return False
+        return ((self.get_coordinate() == rhs.get_coordinate()) and (self.get_weight() == rhs.get_weight()))
+    
+    def get_coordinate(self) -> Coordinate:
+        return self.coordinate
     
     def get_col(self) -> int:
         return self.coordinate.get_col()

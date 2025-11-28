@@ -42,30 +42,24 @@ class Grid:
         
         return True
                 
-    def update(self, new_grid:list[list[ManifestItem]]):
-        row_count = len(new_grid)
-        col_count = len(new_grid[0])
-
-        if row_count != self.row_count:
-            print("Row count given is not correct for grid init")
-            exit()
-
-        if col_count != self.col_count:
-            print("Col count given is not correct for grid init")
-            exit()
+    def update(self, new_grid:list[ManifestItem]):
+        row_count = self.get_row_count()
+        col_count = self.get_col_count()
         
         for row in range(row_count):
             for col in range(col_count):
-                if new_grid[row][col] == "NAN":
+                item = new_grid[(row * col_count) + col]
+                if item.get_title() == "NAN":
                     type = CellTypes.NAN
                     value = ''
-                elif new_grid[row][col] == "UNUSED":
+                elif item.get_title() == "UNUSED":
                     type = CellTypes.UNUSED
                     value = ''
                 else:
                     type = CellTypes.USED
-                    value = new_grid[row][col]
+                    value = new_grid[(row * col_count) + col]
 
-                self.grid[row_count][col_count].setType(type)
-                self.grid[row_count][col_count].setValue(value)
-                self.grid[row_count][col_count].updateText()
+                self.grid[row][col].set_type(type)
+                self.grid[row][col].set_value(value)
+                self.grid[row][col].set_item(item)
+                self.grid[row][col].update_text()
