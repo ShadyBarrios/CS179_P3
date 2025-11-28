@@ -1,4 +1,9 @@
 from coordinate import Coordinate
+from enum import Enum
+
+class ItemPosition(Enum):
+    PORT = 1
+    STARBOARD = 2
 
 class ManifestItem:
     def __init__(self, coordinate:Coordinate, weight:int, title:str):
@@ -6,22 +11,27 @@ class ManifestItem:
         self.weight = weight
         self.title = title
 
-    def __eq__(self, rhs):
+        if coordinate.get_col() <= 6:
+            self.position = ItemPosition.PORT
+        else:
+            self.position = ItemPosition.STARBOARD
+
+    def __eq__(self, rhs) -> int:
         return self.coordinate == rhs.coordinate
     
-    def get_col(self):
+    def get_col(self) -> int:
         return self.coordinate.get_col()
 
-    def get_row(self):
+    def get_row(self) -> int:
         return self.coordinate.get_row()
 
-    def get_row_for_display(self):
+    def get_row_for_display(self) -> int:
         return (8 - self.coordinate.get_row())
     
-    def get_title(self):
+    def get_title(self) -> str:
         return self.title
     
-    def get_title_for_display(self):
+    def get_title_for_display(self) -> str:
         if self.get_title() == "UNUSED" or self.get_title == "NAN":
             return "UNUSED" # same length as "unused"
         elif len(self.get_title()) > 6:
@@ -29,6 +39,9 @@ class ManifestItem:
         else:
             return self.get_title()
     
-    def get_weight(self):
+    def get_weight(self) -> int:
         return self.weight
+
+    def get_position(self) -> ItemPosition:
+        return self.position
     

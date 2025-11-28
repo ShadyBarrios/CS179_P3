@@ -10,6 +10,7 @@ def main():
     widget = MainWindow()
     components = Components(widget.ui)
     components.ui.FilePickButton.clicked.connect(components.pick_file)
+    components.ui.RestartButton.clicked.connect(components.restart)
     widget.show()
     sys.exit(app.exec())
 

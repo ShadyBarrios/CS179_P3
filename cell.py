@@ -1,6 +1,6 @@
 from enum import Enum
 from PySide6 import QtWidgets, QtCore
-from manifest import ManifestItem
+from manifest import ManifestItem, ItemPosition
 
 class CellTypes(Enum):
     UNUSED = 1
@@ -11,10 +11,12 @@ class CellTypes(Enum):
 
 StyleBackgroundDict = {
     CellTypes.NAN: "background-color:BLACK; color:BLACK;",
-    CellTypes.UNUSED: "background-color:WHITE; color:WHITE",
+    CellTypes.UNUSED: "background-color:WHITE; color:WHITE;",
     CellTypes.USED: "background-color:rgba(255, 165, 0, 0.5); color:BLACK;",
     CellTypes.TARGET: "background-color:rgba(255, 0, 0, 0.5); color:BLACK;",
-    CellTypes.SOURCE: "background-color:rgba(60, 179, 133, 0.5); color:BLACK;"
+    CellTypes.SOURCE: "background-color:rgba(60, 179, 133, 0.5); color:BLACK;",
+    ItemPosition.PORT: "background-color:WHITE; color:WHITE;",
+    ItemPosition.STARBOARD: "background-color:GRAY; color:GRAY;"
 }
 
 class Cell:
@@ -34,24 +36,27 @@ class Cell:
         self.style = self.base_stylesheet + StyleBackgroundDict[self.type]
         self.label.setStyleSheet(self.style)
 
-    def getType(self):
+    def get_type(self):
         return self.type
 
-    def setValue(self, value:str):
+    def set_value(self, value:str):
         self.value = value
 
-    def setType(self, type:CellTypes):
+    def set_type(self, type:CellTypes):
         self.type = type
 
-    def updateText(self, value:str=None):
+    def update_text(self, value:str=None):
         if value is None:
             self.label.setText(self.value)
         else:
             self.label.setText(value)
 
-    def setStyle(self, style:str):
+    def set_style(self, style:str):
         self.label.setStyleSheet(style)
         self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
-    def generateStyle(self) -> str:
-        return self.base_stylesheet + StyleBackgroundDict[self.type]
+    def generate_style(self) -> str:
+        background = self.get_type()
+        if self.type == CellTypes.UNUSED:
+            background = self.item.get_position()
+        return self.base_stylesheet + StyleBackgroundDict[background]

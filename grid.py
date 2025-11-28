@@ -16,6 +16,31 @@ class Grid:
             exit()
 
         self.grid = grid
+
+    def get_row_count(self) -> int:
+        return self.row_count
+
+    def get_col_count(self) -> int:
+        return self.col_count
+
+    def get_grid(self) -> list[list[Cell]]:
+        return self.grid
+
+    # will check if layout is physically possible (no floating items)
+    def valid_grid(self) -> bool:
+        grid = self.get_grid()
+        rows = self.get_row_count()
+        cols = self.get_col_count()
+
+        for row in range(1,rows):
+            for col in range(cols):
+                item = grid[row][col]
+                if item.get_type() == CellTypes.USED:
+                    item_below = grid[row-1][col]
+                    if item_below.get_type() != CellTypes.USED:
+                        return False
+        
+        return True
                 
     def update(self, new_grid:list[list[ManifestItem]]):
         row_count = len(new_grid)

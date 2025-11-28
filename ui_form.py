@@ -83,6 +83,36 @@ class Ui_MainWindow(object):
 
         self.FilePickLayout.addItem(self.horizontalSpacer_4)
 
+        self.horizontalLayoutWidget_2 = QWidget(self.centralwidget)
+        self.horizontalLayoutWidget_2.setObjectName(u"horizontalLayoutWidget_2")
+        self.horizontalLayoutWidget_2.setGeometry(QRect(10, 69, 1181, 61))
+        self.ErrorLayout = QHBoxLayout(self.horizontalLayoutWidget_2)
+        self.ErrorLayout.setObjectName(u"ErrorLayout")
+        self.ErrorLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.ErrorLayout.addItem(self.horizontalSpacer_5)
+
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.ErrorLabel = QLabel(self.horizontalLayoutWidget_2)
+        self.ErrorLabel.setObjectName(u"ErrorLabel")
+        self.ErrorLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout.addWidget(self.ErrorLabel)
+
+        self.RestartButton = QPushButton(self.horizontalLayoutWidget_2)
+        self.RestartButton.setObjectName(u"RestartButton")
+
+        self.verticalLayout.addWidget(self.RestartButton)
+
+
+        self.ErrorLayout.addLayout(self.verticalLayout)
+
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.ErrorLayout.addItem(self.horizontalSpacer_6)
+
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -94,5 +124,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Keogh's Port App by CyberSmiths", None))
         self.FilePickLabel.setText(QCoreApplication.translate("MainWindow", u"Enter a manifest (must be .txt):", None))
         self.FilePickButton.setText(QCoreApplication.translate("MainWindow", u"Choose a file", None))
+        self.ErrorLabel.setText(QCoreApplication.translate("MainWindow", u"Error", None))
+        self.RestartButton.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
     # retranslateUi
 
