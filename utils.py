@@ -75,3 +75,12 @@ def compare_weight_lists(list_one:list[list[int]], list_two:list[list[int]]) -> 
         list_two.remove(column)
 
     return (len(list_two) == 0)
+
+def calculate_weight(grid:list[list[ManifestItem]]) -> int:
+    weight = 0
+
+    for row in grid:
+        for item in row:
+            weight += item.get_weight()
+    
+    return weight

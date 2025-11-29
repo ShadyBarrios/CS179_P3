@@ -52,3 +52,9 @@ class Action:
                         wanted_items.append(item if desired == Wanted.MoveableItems else item_above)
         
         return wanted_items
+    
+    def manhattan_dist(self) -> int:
+        row_diff = abs(self.source.get_row() - self.target.get_row())
+        col_diff = abs(self.source.get_col() - self.target.get_col())
+
+        return (row_diff + col_diff)

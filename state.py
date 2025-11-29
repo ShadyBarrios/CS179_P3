@@ -1,6 +1,7 @@
 from manifest import ManifestItem, ItemPosition
 from cell import CellTypes
-from utils import get_sides, get_weight_list, compare_weight_lists
+from utils import get_sides, get_weight_list, compare_weight_lists, calculate_weight
+from action import Action
 
 class State:
     def __init__(self, grid:list[list[ManifestItem]]):
@@ -37,11 +38,7 @@ class State:
         return hash(self.grid)
     
     # in order for two grid to be "equal"
-    # they must have the same quantity of each type of weight on the same or mirror each other
-    #TODO: Need to fix, stacked weights is not the same as non-stacked weights
-    # ex)
-    # - 2 -         - - - 
-    # - 1 -    !=   2 1 - because 1 can move on the right but not the left... compare columns?
+    # they must have the same quantity of each type of weight on the similar columns or mirror each other
     def __eq__(self, rhs):
         if not isinstance(rhs, State):
             return False
@@ -71,3 +68,44 @@ class State:
 
         return mirrored_weights
     
+    def actions(self) -> list[Action]:
+        moveable_items = Action.get_moveable_items(self.grid)
+        open_spots = Action.get_open_spots(self.grid)
+
+        actions = []
+
+        for source in moveable_items:
+            for target in open_spots:
+                actions.append(Action(source, target))
+        
+        return actions
+    
+    def move(self, action:Action):
+        new_grid = action.execute_move(self.get_grid())
+
+        return State(new_grid)
+    
+    # criteria b: |Ph - Sh| < (Sum(Po, So) * 0.10) -> 0 < (sum(Po, So) * 10) - |Ph - Sh|
+    # therefore, an admissible heurstic would be (sum(Po, So) * 0.10) - |Ph - Sh|
+    # however, this could be negative and h(n) must be >= 0, so h(n) = max(0, (sum(Po, So) * 0.10) - |Ph-Sh|)
+    def calculate_heuristic(self) -> float:
+        criteria_b_calc = self.criteria_b()
+        return max(0, criteria_b_calc)
+
+    def criteria_b(self) -> float:
+        port_side, starboard_side = get_sides(self.get_grid())
+
+        port_side_weight = calculate_weight(port_side)
+        starboard_side_weight = calculate_weight(starboard_side)
+
+        side_diff = abs(port_side_weight - starboard_side_weight)
+        total_weight = port_side_weight + starboard_side_weight
+
+        return (total_weight*.10) - side_diff
+    
+    # criteria b: |Ph - Sh| < (Sum(Po, So) * 0.10) -> 0 < (sum(Po, So) * 10) - |Ph - Sh|
+    # therefore a pass is (sum(Po, So) * 10) - |Ph - Sh| <= 0
+    def meets_criteria_b(self) -> bool:
+        criteria_b_calc = self.criteria_b()
+        return (criteria_b_calc <= 0)
+
