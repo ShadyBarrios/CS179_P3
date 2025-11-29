@@ -48,23 +48,30 @@ def get_sides(grid:list[list]) -> tuple[list[list],list[list]]:
     
     return port_side, starboard_side
 
-def get_weight_list(grid:list[list[ManifestItem]]) -> list[int]:
+# return columns of weights
+def get_weight_list(grid:list[list[ManifestItem]]) -> list[list[int]]:
     weights = []
+    row_count = len(grid)
+    col_count = len(grid[0])
 
-    for row in grid:
-        for item in row:
-            if item.get_type() == CellTypes.USED:
-                weights.append(item.get_weight())
-    
+    for col in range(col_count):
+        col_weights = []
+        for row in range(row_count):
+            item = grid[row][col]
+            if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                col_weights.append(item)
+        if len(col_weights) > 0:
+            weights.append(col_weights)
+
     return weights
 
 # criteria for false:
-# 1) weight in list_one is not present in list_two (quantity matters)
-# 2) after removing all weights in list_one from list_two, list_two is not empty
-# def compare_weight_lists(list_one:list[int], list_two:list[int]) -> bool:
-#     for weight in list_one:
-#         if weight not in list_two:
-#             return False
-#         list_two.remove(weight)
-    
-#     return (len(list_two) == 0)
+# 1) weight column in list_one is not present in list_two (quantity matters)
+# 2) after removing all weight columns in list_one from list_two, list_two is not empty
+def compare_weight_lists(list_one:list[list[int]], list_two:list[list[int]]) -> bool:
+    for column in list_one:
+        if column not in list_two:
+            return False
+        list_two.remove(column)
+
+    return (len(list_two) == 0)

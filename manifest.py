@@ -50,4 +50,7 @@ class ManifestItem:
 
     def get_position(self) -> ItemPosition:
         return self.position
+
+    def set_coordinate(self, coordinate:Coordinate):
+        self.coordinate = coordinate
     
