@@ -34,14 +34,31 @@ StyleBackgroundDict = {
 class Cell:
     base_stylesheet = "padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black;"
 
-    def __init__(self, label:QtWidgets.QLabel, item:ManifestItem):
-        self.label = label
+    def __init__(self, item:ManifestItem):
         self.item = item
         self.type = CellTypes.to_type(item.get_title())
+        self.label = QtWidgets.QLabel()
         self.targetType = None
 
+        self._set_label_text()
         self.style = self.base_stylesheet + StyleBackgroundDict[self.type]
         self.label.setStyleSheet(self.style)
+
+    def _set_label_text(self):
+        if self.item.title == "UNUSED" or self.item.title == "NAN":
+            self.label.setText("UNUSED")
+        else:
+            self.label.setText(str(self.item.weight))
+        # elif len(self.item.title) > 6:
+        #     self.label.setText(self.item.title[:5]+"...")
+        # else:
+        #     self.label.setText(self.item.title)
+    
+    def get_display_row(self) -> int:
+        return (8 - self.item.get_row())
+    
+    def get_display_col(self) -> int:
+        return self.item.get_col()
 
     def get_type(self) -> CellTypes:
         return self.type

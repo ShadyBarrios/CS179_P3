@@ -10,11 +10,7 @@ class ManifestItem:
         self.coordinate = coordinate
         self.weight = weight
         self.title = title
-
-        if coordinate.get_col() <= 6:
-            self.position = ItemPosition.PORT
-        else:
-            self.position = ItemPosition.STARBOARD
+        self.position = ItemPosition.PORT if coordinate.get_col() <= 6 else ItemPosition.STARBOARD
 
     # only the coordinate and weight matter for matching, no difference in state if title is different
     def __eq__(self, rhs) -> int:
@@ -30,21 +26,10 @@ class ManifestItem:
 
     def get_row(self) -> int:
         return self.coordinate.get_row()
-
-    def get_row_for_display(self) -> int:
-        return (8 - self.coordinate.get_row())
     
     def get_title(self) -> str:
         return self.title
-    
-    def get_title_for_display(self) -> str:
-        if self.get_title() == "UNUSED" or self.get_title == "NAN":
-            return "UNUSED" # same length as "unused"
-        elif len(self.get_title()) > 6:
-            return self.get_title()[:5] + "..."
-        else:
-            return self.get_title()
-    
+
     def get_weight(self) -> int:
         return self.weight
 

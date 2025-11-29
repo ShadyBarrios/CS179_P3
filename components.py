@@ -92,14 +92,9 @@ class Components:
             gridRow = []
             for col in range(self.col_count):
                 item = grid_parse[(row*(self.col_count) + col)]
+                cell = Cell(item)
 
-                label = QtWidgets.QLabel()
-                text = item.get_title_for_display()
-                label.setText(text)
-
-                self.ui.ShipGrid.addWidget(label, item.get_row_for_display(), item.get_col())
-
-                cell = Cell(label, item)
+                self.ui.ShipGrid.addWidget(cell.label, cell.get_display_row(), cell.get_display_col())
 
                 style = cell.generate_style()
                 cell.set_style(style)
