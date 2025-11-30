@@ -29,3 +29,4 @@ class Solution:
     
     def num_actions(self) -> int:
         return len(self.actions)
+    

@@ -5,7 +5,9 @@ from enum import Enum
 from file_io import ParseErrorTypes, parse_file
 from state import State
 from solution import Solution
-from search import a_star_search
+from search import Search
+from PySide6 import QtCore
+import time
 
 class States(Enum):
     init_grid = 1
@@ -17,7 +19,39 @@ class Pages(Enum):
     FilePickPage = 1
     ErrorPage = 2
 
-class Components:
+class SearchWorker(QtCore.QObject):
+    solution = QtCore.Signal(Solution)
+
+    def __init__(self, initial_state:State):
+        super().__init__()
+        self.initial_state = initial_state
+    
+    @QtCore.Slot()
+    def run_search(self):
+        self.search = Search(self.initial_state)
+        time.sleep(0.5)
+        solution = self.search.a_star_search()
+        print(f"Hi within thread: {solution.num_actions()} moves in solution")
+        self.solution.emit(solution)
+
+class SearchThread(QtCore.QObject):
+
+    def __init__(self, parse):
+        super().__init__(None)
+        self.thread = QtCore.QThread()
+        grid = create_grid_from_list(parse)
+        self.worker = SearchWorker(State(grid))
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run_search)
+        self.worker.solution.connect(self.thread.quit)
+        self.worker.solution.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+    
+    def run(self):
+        self.thread.start()
+
+class Components():
+    searchThread = None
     col_count: int = 12
     row_count: int = 8
 
@@ -32,7 +66,10 @@ class Components:
         if result == None:
             return
         else:
-            self.solve(result)
+            self.searchThread = SearchThread(result)
+            self.searchThread.worker.solution.connect(self.solution_found)
+            self.searchThread.run()
+
 
     def pick_file(self):
         file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a manifest txt file", None, "Text Files (*.txt)")
@@ -72,10 +109,9 @@ class Components:
         self.display_parse_results(num_used_cells, self.get_src_file_name())
         self.show_all(self.ui.ShipGridLayout)
 
-    def solve(self, grid_parse:list[ManifestItem]):
-        grid = create_grid_from_list(grid_parse)
-        solution = a_star_search(State(grid))
-        print(solution)
+    @QtCore.Slot(Solution)
+    def solution_found(self, solution):
+        print(f"Hi outside of thread... solution:\n{solution}")
 
     def hide_all(self, parentLayout: QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
