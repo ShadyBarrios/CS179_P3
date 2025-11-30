@@ -23,10 +23,19 @@ def get_all_children_items(item) -> list[QtWidgets.QWidget]:
     else:
         return []
 
-
 def get_file_root_name(file_name:str) -> str:
     return Path(file_name).stem
-    
+
+def create_grid_from_list(item_list: list[ManifestItem], row_count: int, col_count: int) -> list[list[ManifestItem]]:
+    grid: list[list[ManifestItem]] = []
+    for row in range(row_count):
+        state_row = []
+        for col in range(col_count):
+            item = item_list[(row*(col_count) + col)]
+            state_row.append(item)
+        grid.append(state_row)
+    return grid
+
 # split grid into two lists, port and starboard (port, starboard)
 def get_sides(grid:list[list]) -> tuple[list[list],list[list]]:
     row_count = 8

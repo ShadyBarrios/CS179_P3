@@ -1,7 +1,6 @@
 from main_window import *
 from utils import *
-from grid import Grid
-from cell import Cell
+from grid_display import GridDisplay
 from enum import Enum
 from file_io import ParseErrorTypes, parse_file
 
@@ -16,12 +15,12 @@ class Pages(Enum):
     ErrorPage = 2
 
 class Components:
-    grid:Grid = None
-    col_count:int = 12
-    row_count:int = 8
+    col_count: int = 12
+    row_count: int = 8
 
     def __init__(self, ui:Ui_MainWindow):
         self.ui = ui
+        self.grid_display = None
         self.src_file_name = None
         self.set_page(Pages.FilePickPage)
         
@@ -59,26 +58,26 @@ class Components:
         self.set_page(Pages.ShipGridPage)
         self.hide_all(self.ui.MessageLayouts)
         self.init_ShipGrid(grid_parse)
-        num_used_cells = self.get_grid().get_num_used_cells()
-        self.display_parse_results(self.get_grid(), num_used_cells, self.get_src_file_name())
+        num_used_cells = self.grid_display.get_num_used_cells()
+        self.display_parse_results(num_used_cells, self.get_src_file_name())
         self.show_all(self.ui.ShipGridLayout)
 
-    def hide_all(self, parentLayout:QtWidgets.QLayout):
+    def hide_all(self, parentLayout: QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
         
         for item in childItems:
             item.setVisible(False)
         
-    def show_all(self, parentLayout:QtWidgets.QLayout):
+    def show_all(self, parentLayout: QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
 
         for item in childItems:
             item.setVisible(True)
         
-    def set_page(self, page:Pages):
+    def set_page(self, page: Pages):
         self.ui.AllPages.setCurrentIndex(page.value)
 
-    def throw_error(self, errorMsg:str):
+    def throw_error(self, errorMsg: str):
         self.set_page(Pages.ErrorPage)
         self.ui.ErrorLabel.setText(errorMsg)
         self.ui.ErrorLabel.setStyleSheet("color:red")
@@ -86,38 +85,30 @@ class Components:
     def restart(self):
         self.set_page(Pages.FilePickPage)
 
-    def init_ShipGrid(self, grid_parse:list[ManifestItem]):
-        grid:list[list[Cell]] = []
-        for row in range(self.row_count):
-            gridRow = []
-            for col in range(self.col_count):
-                item = grid_parse[(row*(self.col_count) + col)]
-                cell = Cell(item)
+    def init_ShipGrid(self, grid_parse: list[ManifestItem]):
+        initial_state_grid = create_grid_from_list(grid_parse, self.row_count, self.col_count)
+        initial_state_grid_display = GridDisplay(initial_state_grid)
 
+        for cell_row in initial_state_grid_display.cell_grid:
+            for cell in cell_row:
                 self.ui.ShipGrid.addWidget(cell.label, cell.get_display_row(), cell.get_display_col())
-
-                style = cell.generate_style()
-                cell.set_style(style)
-
-                gridRow.append(cell)
-            grid.append(gridRow)
-
-        self.grid = Grid(grid, self.row_count, self.col_count)
-        if not self.grid.valid_grid():
+        
+        if not initial_state_grid_display.valid_grid():
             self.throw_error("ERROR: Ship layout is not allowed (asymmetric or floating objects)! Try again with a new file.")
-    
-    def display_parse_results(self, grid:Grid, num_used_cells:int, src_file_name:str):
+
+        self.grid_display = initial_state_grid_display
+
+    def display_parse_results(self, num_used_cells: int, src_file_name: str):
         root_name = get_file_root_name(src_file_name)
         message = f"{root_name} has {num_used_cells} containers\nComputing a solution..."
         self.display_message(message)
         self.show_all(self.ui.MessageLhsLayout)
 
-
-    def display_message(self, message:str):
+    def display_message(self, message: str):
         self.ui.MessageLhsLabel.setText(message)
 
-    def get_grid(self) -> Grid:
-        return self.grid
+    def get_grid_display(self) -> GridDisplay:
+        return self.grid_display
 
     def get_src_file_name(self) -> str:
         return self.src_file_name
