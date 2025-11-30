@@ -1,6 +1,7 @@
 from manifest import ManifestItem
 from action import Action
 from state import State
+from utils import get_sides, calculate_weight
 
 class Node:
     def __init__(self, grid:list[list[ManifestItem]], cost:int=0, heuristic:float=0, action:Action=None, children=None, parent=None):
@@ -13,6 +14,13 @@ class Node:
 
         self.row_count = 8
         self.col_count = 12
+    
+    def __lt__(self, rhs):
+        if not(isinstance(rhs, Node)):
+            print("ERROR: Improper compare in node __lt__")
+            return False
+        
+        return self.get_total_cost() < rhs.get_total_cost()
     
     def get_weights(self) -> tuple[int, int]:
         return self.state.get_weights()
@@ -38,6 +46,9 @@ class Node:
     def get_state(self) -> State:
         return self.state
     
+    def get_action(self) -> Action:
+        return self.action
+    
     def generate_children(self):
         children:list[Node] = []
 
@@ -53,9 +64,10 @@ class Node:
     def meets_criteria_b(self) -> bool:
         return self.get_state().meets_criteria_b()
     
-
+    def get_weight_diff(self) -> int:
+        port_side_weight, starboard_side_weight = self.get_state().get_side_weights()
+        return abs(port_side_weight - starboard_side_weight)
     
-
 
     
 

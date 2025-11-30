@@ -26,7 +26,7 @@ def get_all_children_items(item) -> list[QtWidgets.QWidget]:
 def get_file_root_name(file_name:str) -> str:
     return Path(file_name).stem
 
-def create_grid_from_list(item_list: list[ManifestItem], row_count: int, col_count: int) -> list[list[ManifestItem]]:
+def create_grid_from_list(item_list: list[ManifestItem], row_count: int = 8, col_count: int = 12) -> list[list[ManifestItem]]:
     grid: list[list[ManifestItem]] = []
     for row in range(row_count):
         state_row = []
@@ -68,7 +68,7 @@ def get_weight_list(grid:list[list[ManifestItem]]) -> list[list[int]]:
         for row in range(row_count):
             item = grid[row][col]
             if CellTypes.to_type(item.get_title()) == CellTypes.USED:
-                col_weights.append(item)
+                col_weights.append(item.get_weight())
         if len(col_weights) > 0:
             weights.append(col_weights)
 
@@ -85,6 +85,7 @@ def compare_weight_lists(list_one:list[list[int]], list_two:list[list[int]]) -> 
 
     return (len(list_two) == 0)
 
+
 def calculate_weight(grid:list[list[ManifestItem]]) -> int:
     weight = 0
 
@@ -93,3 +94,21 @@ def calculate_weight(grid:list[list[ManifestItem]]) -> int:
             weight += item.get_weight()
     
     return weight
+
+def compare_str_lists(list_one:list[str], list_two:list[str]) -> bool:
+    for string in list_one:
+        if string not in list_two:
+            return False
+        list_two.remove(string)
+    
+    return len(list_two) == 0
+
+def copy_grid(grid:list[list[ManifestItem]]) -> list[list[ManifestItem]]:
+    grid_copy:list[list[ManifestItem]] = []
+    for row in grid:
+        copy_row:list[ManifestItem] = []
+        for item in row:
+            copy_row.append(item.copy())
+        grid_copy.append(copy_row)
+
+    return grid_copy

@@ -3,6 +3,9 @@ from utils import *
 from grid_display import GridDisplay
 from enum import Enum
 from file_io import ParseErrorTypes, parse_file
+from state import State
+from solution import Solution
+from search import a_star_search
 
 class States(Enum):
     init_grid = 1
@@ -24,6 +27,12 @@ class Components:
         self.src_file_name = None
         self.set_page(Pages.FilePickPage)
         
+    def start_app(self):
+        result = self.pick_file()
+        if result == None:
+            return
+        else:
+            self.solve(result)
 
     def pick_file(self):
         file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a manifest txt file", None, "Text Files (*.txt)")
@@ -31,7 +40,7 @@ class Components:
 
         if file_name == '':
             self.throw_error("File not picked. Try again.")
-            return
+            return None
 
         grid_parse = parse_file(file_name)
 
@@ -39,28 +48,34 @@ class Components:
             match grid_parse:
                 case ParseErrorTypes.FileNotFound:
                     self.throw_error("ERROR: File not found. Try again.")
-                    return
+                    return None
                 case ParseErrorTypes.IncorrectFileType:
                     self.throw_error("ERROR: Must pick .txt file. Try again.")
-                    return
+                    return None
                 case ParseErrorTypes.IncorrectFileFormatting:
                     self.throw_error("Error: File is not formatted properly. Try again.")
-                    return
+                    return None
                 case ParseErrorTypes.IncorrectManifestLength:
                     self.throw_error("Error: Manifest does not match expected length (n = 96). Try again.")
-                    return
+                    return None
         
         self.src_file_name = file_name
         self.begin(grid_parse)
-        return 
+        return grid_parse
 
     def begin(self, grid_parse:list[ManifestItem]):
         self.set_page(Pages.ShipGridPage)
         self.hide_all(self.ui.MessageLayouts)
+        self.hide_all(self.ui.ShipGridLayout)
         self.init_ShipGrid(grid_parse)
         num_used_cells = self.grid_display.get_num_used_cells()
         self.display_parse_results(num_used_cells, self.get_src_file_name())
         self.show_all(self.ui.ShipGridLayout)
+
+    def solve(self, grid_parse:list[ManifestItem]):
+        grid = create_grid_from_list(grid_parse)
+        solution = a_star_search(State(grid))
+        print(solution)
 
     def hide_all(self, parentLayout: QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)

@@ -12,6 +12,9 @@ class ManifestItem:
         self.title = title
         self.position = ItemPosition.PORT if coordinate.get_col() <= 6 else ItemPosition.STARBOARD
 
+    def copy(self):
+        return ManifestItem(self.coordinate.copy(), self.weight, self.title)
+    
     # only the coordinate and weight matter for matching, no difference in state if title is different
     def __eq__(self, rhs) -> int:
         if not isinstance(rhs, ManifestItem):
@@ -38,4 +41,15 @@ class ManifestItem:
 
     def set_coordinate(self, coordinate:Coordinate):
         self.coordinate = coordinate
+
+    def directly_below(self, rhs):
+        if not(isinstance(rhs, ManifestItem)):
+            print("ERROR: Improper compare in directly_below")
+            return False
+        
+        same_col = self.get_coordinate().get_col() == rhs.get_coordinate().get_col()
+        row_under = (self.get_coordinate().get_row() == (rhs.get_coordinate().get_row() - 1))
+        return (same_col and row_under)
     
+    def empty_item(coordinate:Coordinate):
+        return ManifestItem(coordinate, 0, "UNUSED")

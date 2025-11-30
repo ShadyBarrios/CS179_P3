@@ -1,7 +1,7 @@
 from manifest import ManifestItem
 from cell import CellTypes
 from enum import Enum
-import copy
+from utils import calculate_weight, copy_grid
 
 # used to determine if open spots or moveable objects are wanted (they use near identical algo's)
 class Wanted(Enum):
@@ -13,46 +13,60 @@ class Action:
         self.source = source
         self.target = target
     
-    # swaps coordinates of source and target, return grid with swapped items
-    def execute_move(self, grid:list[list[ManifestItem]]) -> list[list[ManifestItem]]:
-        source_copy = copy.copy(self.source)
-        source_coordinate = copy.copy(source_copy.get_coordinate())
-
-        target_copy = copy.copy(self.target)
-
-        source_copy.set_coordinate(target_copy.get_coordinate())
-        target_copy.set_coordinate(source_coordinate)
-
-        grid_copy = copy.copy(grid)
-        grid_copy[source_copy.get_row()-1][source_copy.get_col()-1] = source_copy
-        grid_copy[target_copy.get_row()-1][target_copy.get_col()-1] = target_copy
+    def __str__(self) -> str:
+        return f"Move {self.source.get_coordinate()} to {self.target.get_coordinate()}"
     
+    # moves source to target, replaces source with empty item (UNUSED)
+    def execute_move(self, grid:list[list[ManifestItem]]) -> list[list[ManifestItem]]:
+        source_copy = self.source.copy()
+        target_copy = self.target.copy()
+
+        grid_copy = copy_grid(grid)
+
+        source_coordinate = source_copy.get_coordinate().copy()
+        target_coordinate = target_copy.get_coordinate().copy()
+
+        # moves source object to target object
+        grid_copy[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source_copy
+        # update new target object's coordinates
+        grid_copy[target_coordinate.get_row()-1][target_coordinate.get_col()-1].set_coordinate(target_coordinate)
+        # update old source coordinate with empty object
+        grid_copy[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
+        
         return grid_copy
         
 
     def get_open_spots(grid:list[list[ManifestItem]]):
-        open_spots = Action.get(Wanted.OpenSpots, grid)
-        return open_spots
-
-    def get_moveable_items(grid:list[list[ManifestItem]]):
-        moveable_items = Action.get(Wanted.MoveableItems, grid)
-        return moveable_items
-    
-    def get(desired:Wanted, grid:list[list[ManifestItem]]):
-        wanted_items:list[ManifestItem] = []
+        open_spots:list[ManifestItem] = []
         row_count = len(grid)
         col_count = len(grid[0])
 
-        for row in range(row_count-1):
+        for row in range(row_count):
             for col in range(col_count):
                 item = grid[row][col]
-                if CellTypes.to_type(item.get_title()) == CellTypes.USED:
-                    item_above = grid[row+1][col]
-                    if CellTypes.to_type(item_above.get_title()) == CellTypes.UNUSED:
-                        wanted_items.append(item if desired == Wanted.MoveableItems else item_above)
-        
-        return wanted_items
+                item_type = CellTypes.to_type(item.get_title())
+                item_below_type = CellTypes.USED if row == 0 else CellTypes.to_type(grid[row-1][col].get_title())
+                if item_type == CellTypes.UNUSED and item_below_type != CellTypes.UNUSED:
+                    open_spots.append(item)
+
+        return open_spots
+
+    def get_moveable_items(grid:list[list[ManifestItem]]):
+        # moveable_items = Action.get(Wanted.MoveableItems, grid)
+        moveable_items:list[ManifestItem] = []
+        row_count = len(grid)
+        col_count = len(grid[0])
+
+        for row in range(row_count):
+            for col in range(col_count):
+                item = grid[row][col]
+                item_type = CellTypes.to_type(item.get_title())
+                item_above_type = CellTypes.UNUSED if row == 7 else CellTypes.to_type(grid[row+1][col].get_title())
+                if item_type == CellTypes.USED and item_above_type == CellTypes.UNUSED:
+                    moveable_items.append(item)
+        return moveable_items
     
+    # TODO: need to do dummy search, can't phase through things
     def manhattan_dist(self) -> int:
         row_diff = abs(self.source.get_row() - self.target.get_row())
         col_diff = abs(self.source.get_col() - self.target.get_col())
