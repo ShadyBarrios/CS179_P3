@@ -18,7 +18,7 @@ class Components:
     col_count: int = 12
     row_count: int = 8
 
-    def __init__(self, ui:Ui_MainWindow):
+    def __init__(self, ui: Ui_MainWindow):
         self.ui = ui
         self.grid_display = None
         self.src_file_name = None
@@ -54,7 +54,7 @@ class Components:
         self.begin(grid_parse)
         return 
 
-    def begin(self, grid_parse:list[ManifestItem]):
+    def begin(self, grid_parse: list[ManifestItem]):
         self.set_page(Pages.ShipGridPage)
         self.hide_all(self.ui.MessageLayouts)
         self.init_ShipGrid(grid_parse)

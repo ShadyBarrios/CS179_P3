@@ -1,9 +1,9 @@
-from manifest import ManifestItem
 from action import Action
+from manifest import ManifestItem
 from state import State
 
 class Node:
-    def __init__(self, grid:list[list[ManifestItem]], cost:int=0, heuristic:float=0, action:Action=None, children=None, parent=None):
+    def __init__(self, grid: list[list[ManifestItem]], cost: int=0, heuristic: float=0, action: Action=None, children=None, parent=None):
         self.state = State(grid)
         self.cost = cost # g(n)
         self.heuristic = heuristic # h(n)

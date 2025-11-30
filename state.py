@@ -5,7 +5,7 @@ from copy import copy
 from utils import get_sides, get_weight_list, compare_weight_lists, calculate_weight
 
 class State:
-    def __init__(self, grid:list[list[ManifestItem]]):
+    def __init__(self, grid: list[list[ManifestItem]]):
         self.row_count = 8
         self.col_count = 12
         self.grid = grid
@@ -99,12 +99,12 @@ class State:
         return self.is_symmetric() and self.is_physically_possible()
     
     # hashes board for lookup
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.grid)
     
     # in order for two grid to be "equal"
     # they must have the same quantity of each type of weight on the similar columns or mirror each other
-    def __eq__(self, rhs):
+    def __eq__(self, rhs) -> bool:
         if not isinstance(rhs, State):
             return False
         
