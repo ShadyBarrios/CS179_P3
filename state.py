@@ -1,8 +1,8 @@
 from action import Action
 from manifest import ManifestItem, ItemPosition
 from cell import CellTypes
-from copy import copy
-from utils import get_sides, get_weight_list, compare_weight_lists, calculate_weight, compare_str_lists, copy_grid
+# from copy import copy
+# from utils import get_weight_list, compare_weight_lists, compare_str_lists
 
 class State:
     def __init__(self, grid: list[list[ManifestItem]]):
@@ -18,8 +18,16 @@ class State:
                 output += str(item.get_weight()) + " "
             output += "\n"
         return output
+
     def copy(self):
-        return State(copy_grid(self.grid))
+        grid_copy: list[list[ManifestItem]] = []
+        for row in self.grid:
+            copy_row: list[ManifestItem] = []
+            for item in row:
+                copy_row.append(item.copy())
+            grid_copy.append(copy_row)
+
+        return State(grid_copy)
     
     def get_row_count(self) -> int:
         return self.row_count
@@ -29,7 +37,41 @@ class State:
     
     def get_grid(self) -> list[list[ManifestItem]]:
         return self.grid
+
+    # Get the total weights on the port and starboard sides
+    def get_side_weights(self) -> tuple[int, int]:
+        port_weight = 0
+        starboard_weight = 0
+
+        for row in self.grid:
+            for item in row:
+                if CellTypes.to_type(item.get_title()) != CellTypes.USED:
+                    continue
+                if item.get_position() == ItemPosition.PORT:
+                    port_weight += item.get_weight()
+                else:
+                    starboard_weight += item.get_weight()
     
+        return (port_weight, starboard_weight)
+    
+    # split grid into two lists, port and starboard (port, starboard)
+    def get_sides(self) -> tuple[list[list[ManifestItem]], list[list[ManifestItem]]]:
+        port_side = []
+        starboard_side = []
+
+        for row in range(self.row_count):
+            port_side_row = []
+            starboard_side_row = []
+            for col in range(self.col_count):
+                if col < 6:
+                    port_side_row.append(self.grid[row][col])
+                else:
+                    starboard_side_row.append(self.grid[row][col])
+            port_side.append(port_side_row)
+            starboard_side.append(starboard_side_row)
+        
+        return port_side, starboard_side
+
     def get_open_spots(self) -> list[ManifestItem]:
         return Action.get_open_spots(self.get_grid())
     
@@ -44,24 +86,9 @@ class State:
         
         return used_count
 
-    def get_weights(self) -> tuple[int, int]:
-        port_weight = 0
-        starboard_weight = 0
-
-        for row in self.grid:
-            for item in row:
-                if CellTypes.to_type(item.get_title()) != CellTypes.USED:
-                    continue
-                if item.get_position() == ItemPosition.PORT:
-                    port_weight += item.get_weight()
-                else:
-                    starboard_weight += item.get_weight()
-    
-        return (port_weight, starboard_weight)
-
     # NAN layout must be mirror across port and starboard side
     def is_symmetric(self) -> bool:
-        port_side, starboard_side = get_sides(self.grid)
+        port_side, starboard_side = self.get_sides()
         port_side_NANs = [] # FALSE not NAN, TRUE is NAN
         starboard_side_NANs = [] # FALSE not NAN, TRUE is NAN
 
@@ -99,53 +126,50 @@ class State:
     def __eq__(self, rhs):
         if not isinstance(rhs, State):
             return False
-        
-        this_grid = self.get_grid()
-        rhs_grid = rhs.get_grid()
 
-        this_port, this_starboard = get_sides(this_grid)
-        rhs_port, rhs_starboard = get_sides(rhs_grid)
+        this_port, this_starboard = self.get_sides()
+        rhs_port, rhs_starboard = rhs.get_sides()
 
-        same_weights = State.compare_weights(this_port, this_starboard, rhs_port, rhs_starboard)
-        same_moveable_objects = State.compare_moveable_objects(this_port, this_starboard, rhs_port, rhs_starboard)
-        
-        return same_weights and same_moveable_objects
+        exactly_same = (this_port == rhs_port and this_starboard == rhs_starboard)
+        mirrored_same = (this_port == rhs_starboard and this_starboard == rhs_port)
+
+        return exactly_same or mirrored_same
     
-    # compares to see that both grids have the same weights on the same sides (or mirrored)
-    def compare_weights(lhs_port, lhs_starboard, rhs_port, rhs_starboard) -> bool:
-        lhs_port_weights = get_weight_list(lhs_port)
-        lhs_starboard_weights = get_weight_list(lhs_starboard)
-        rhs_port_weights = get_weight_list(rhs_port)
-        rhs_starboard_weights = get_weight_list(rhs_starboard)
+    # # compares to see that both grids have the same weights on the same sides (or mirrored)
+    # def compare_weights(lhs_port, lhs_starboard, rhs_port, rhs_starboard) -> bool:
+    #     lhs_port_weights = get_weight_list(lhs_port)
+    #     lhs_starboard_weights = get_weight_list(lhs_starboard)
+    #     rhs_port_weights = get_weight_list(rhs_port)
+    #     rhs_starboard_weights = get_weight_list(rhs_starboard)
 
-        port = compare_weight_lists(lhs_port_weights, rhs_port_weights)
-        starboard = compare_weight_lists(lhs_starboard_weights, rhs_starboard_weights)
-        normal = port and starboard
+    #     port = compare_weight_lists(lhs_port_weights, rhs_port_weights)
+    #     starboard = compare_weight_lists(lhs_starboard_weights, rhs_starboard_weights)
+    #     normal = port and starboard
 
-        # the grid can also be considered equal if they mirror each other
-        port_mirrored = compare_weight_lists(lhs_port_weights, rhs_starboard_weights)
-        # split for readability (too long of a line)
-        starboard_mirrored = compare_weight_lists(lhs_starboard_weights, rhs_port_weights)
-        mirrored = port_mirrored and starboard_mirrored
+    #     # the grid can also be considered equal if they mirror each other
+    #     port_mirrored = compare_weight_lists(lhs_port_weights, rhs_starboard_weights)
+    #     # split for readability (too long of a line)
+    #     starboard_mirrored = compare_weight_lists(lhs_starboard_weights, rhs_port_weights)
+    #     mirrored = port_mirrored and starboard_mirrored
 
-        return normal or mirrored
+    #     return normal or mirrored
 
-    # compares to see that both grids have the same moveable objects on the same sides (or mirrored)
-    def compare_moveable_objects(lhs_port, lhs_starboard, rhs_port, rhs_starboard) -> bool:
-        lhs_port_moveable_objects = [item.get_title() for item in Action.get_moveable_items(lhs_port)]
-        lhs_starboard_moveable_objects = [item.get_title() for item in Action.get_moveable_items(lhs_starboard)]
-        rhs_port_moveable_objects = [item.get_title() for item in Action.get_moveable_items(rhs_port)]
-        rhs_starboard_moveable_objects = [item.get_title() for item in Action.get_moveable_items(rhs_starboard)]
+    # # compares to see that both grids have the same moveable objects on the same sides (or mirrored)
+    # def compare_moveable_objects(lhs_port, lhs_starboard, rhs_port, rhs_starboard) -> bool:
+    #     lhs_port_moveable_objects = [item.get_title() for item in Action.get_moveable_items(lhs_port)]
+    #     lhs_starboard_moveable_objects = [item.get_title() for item in Action.get_moveable_items(lhs_starboard)]
+    #     rhs_port_moveable_objects = [item.get_title() for item in Action.get_moveable_items(rhs_port)]
+    #     rhs_starboard_moveable_objects = [item.get_title() for item in Action.get_moveable_items(rhs_starboard)]
 
-        port = compare_str_lists(lhs_port_moveable_objects, rhs_port_moveable_objects)
-        starboard = compare_str_lists(lhs_starboard_moveable_objects, rhs_starboard_moveable_objects)
-        normal = port and starboard
+    #     port = compare_str_lists(lhs_port_moveable_objects, rhs_port_moveable_objects)
+    #     starboard = compare_str_lists(lhs_starboard_moveable_objects, rhs_starboard_moveable_objects)
+    #     normal = port and starboard
 
-        port_mirrored = compare_str_lists(lhs_port_moveable_objects, rhs_starboard_moveable_objects)
-        starboard_mirrored = compare_str_lists(lhs_starboard_moveable_objects, rhs_port_moveable_objects)
-        mirrored = port_mirrored and starboard_mirrored
+    #     port_mirrored = compare_str_lists(lhs_port_moveable_objects, rhs_starboard_moveable_objects)
+    #     starboard_mirrored = compare_str_lists(lhs_starboard_moveable_objects, rhs_port_moveable_objects)
+    #     mirrored = port_mirrored and starboard_mirrored
 
-        return normal or mirrored
+    #     return normal or mirrored
     
     # calculates all the possible operations from the current state
     def generate_actions(self) -> list[Action]:
@@ -172,15 +196,6 @@ class State:
     def calculate_heuristic(self) -> float:
         criteria_b_calc = self.criteria_b()
         return max(0, criteria_b_calc)
-    
-    def get_side_weights(self) -> tuple[int, int]:
-        port_side, starboard_side = get_sides(self.get_grid())
-
-        port_side_weight = calculate_weight(port_side)
-        starboard_side_weight = calculate_weight(starboard_side)
-
-        return port_side_weight, starboard_side_weight
-
 
     def criteria_b(self) -> float:
         port_side_weight, starboard_side_weight = self.get_side_weights()

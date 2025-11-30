@@ -1,7 +1,6 @@
 from action import Action
 from manifest import ManifestItem
 from state import State
-from utils import get_sides, calculate_weight
 
 class Node:
     def __init__(self, grid: list[list[ManifestItem]], cost: int=0, heuristic: float=0, action: Action=None, children=None, parent=None):

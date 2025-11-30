@@ -37,25 +37,25 @@ def create_grid_from_list(item_list: list[ManifestItem], row_count: int = 8, col
     return grid
 
 # split grid into two lists, port and starboard (port, starboard)
-def get_sides(grid:list[list]) -> tuple[list[list],list[list]]:
-    row_count = 8
-    col_count = 12
+# def get_sides(grid:list[list]) -> tuple[list[list],list[list]]:
+#     row_count = 8
+#     col_count = 12
 
-    port_side = []
-    starboard_side = []
+#     port_side = []
+#     starboard_side = []
 
-    for row in range(row_count):
-        port_side_row = []
-        starboard_side_row = []
-        for col in range(col_count):
-            if col < 6:
-                port_side_row.append(grid[row][col])
-            else:
-                starboard_side_row.append(grid[row][col])
-        port_side.append(port_side_row)
-        starboard_side.append(starboard_side_row)
+#     for row in range(row_count):
+#         port_side_row = []
+#         starboard_side_row = []
+#         for col in range(col_count):
+#             if col < 6:
+#                 port_side_row.append(grid[row][col])
+#             else:
+#                 starboard_side_row.append(grid[row][col])
+#         port_side.append(port_side_row)
+#         starboard_side.append(starboard_side_row)
     
-    return port_side, starboard_side
+#     return port_side, starboard_side
 
 # return columns of weights
 def get_weight_list(grid:list[list[ManifestItem]]) -> list[list[int]]:

@@ -1,7 +1,6 @@
 from manifest import ManifestItem
 from cell import CellTypes
-from enum import Enum
-from utils import calculate_weight, copy_grid
+from utils import copy_grid
 
 
 class Action:
