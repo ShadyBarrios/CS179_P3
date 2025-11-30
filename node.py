@@ -1,10 +1,10 @@
-from manifest import ManifestItem
 from action import Action
+from manifest import ManifestItem
 from state import State
 from utils import get_sides, calculate_weight
 
 class Node:
-    def __init__(self, grid:list[list[ManifestItem]], cost:int=0, heuristic:float=0, action:Action=None, children=None, parent=None):
+    def __init__(self, grid: list[list[ManifestItem]], cost: int=0, heuristic: float=0, action: Action=None, children=None, parent=None):
         self.state = State(grid)
         self.cost = cost # g(n)
         self.heuristic = heuristic # h(n)
@@ -54,7 +54,7 @@ class Node:
 
         current_state = self.get_state()
 
-        for action in current_state.actions():
+        for action in current_state.generate_actions():
             new_state = current_state.move(action)
             heuristic = new_state.calculate_heuristic()
             node = Node(new_state.get_grid(), (self.cost + action.manhattan_dist()), heuristic, action, parent=self)

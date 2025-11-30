@@ -1,10 +1,11 @@
+from action import Action
 from manifest import ManifestItem, ItemPosition
 from cell import CellTypes
+from copy import copy
 from utils import get_sides, get_weight_list, compare_weight_lists, calculate_weight, compare_str_lists, copy_grid
-from action import Action
 
 class State:
-    def __init__(self, grid:list[list[ManifestItem]]):
+    def __init__(self, grid: list[list[ManifestItem]]):
         self.row_count = 8
         self.col_count = 12
         self.grid = grid
@@ -28,6 +29,12 @@ class State:
     
     def get_grid(self) -> list[list[ManifestItem]]:
         return self.grid
+    
+    def get_open_spots(self) -> list[ManifestItem]:
+        return Action.get_open_spots(self.get_grid())
+    
+    def get_moveable_items(self) -> list[ManifestItem]:
+        return Action.get_moveable_items(self.get_grid())
 
     def get_num_used_cells(self) -> int:
         used_count = 0
@@ -51,7 +58,7 @@ class State:
                     starboard_weight += item.get_weight()
     
         return (port_weight, starboard_weight)
-    
+
     # NAN layout must be mirror across port and starboard side
     def is_symmetric(self) -> bool:
         port_side, starboard_side = get_sides(self.grid)
@@ -140,9 +147,10 @@ class State:
 
         return normal or mirrored
     
-    def actions(self) -> list[Action]:
-        moveable_items:list[ManifestItem] = Action.get_moveable_items(self.grid)
-        open_spots:list[ManifestItem] = Action.get_open_spots(self.grid)
+    # calculates all the possible operations from the current state
+    def generate_actions(self) -> list[Action]:
+        moveable_items = self.get_moveable_items()
+        open_spots = self.get_open_spots()
 
         actions = []
 
@@ -153,11 +161,10 @@ class State:
                 actions.append(Action(source, target))
         
         return actions
-    
-    def move(self, action:Action):
-        new_grid = action.execute_move(self.get_grid())
 
-        return State(new_grid)
+    # swaps coordinates of source and target, returns a new state
+    def move(self, action:Action):
+        return State(action.execute_move(self.get_grid()))
     
     # criteria b: |Ph - Sh| < (Sum(Po, So) * 0.10), so expected is |Ph-Sh| > (Sum(Po, So) * 0.1) therefore |Ph - Sh| - (sum(Po, So) * 10) > 0
     # therefore, an admissible heurstic would be |Ph - Sh| - (sum(Po, So) * 10)

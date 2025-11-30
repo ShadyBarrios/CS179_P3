@@ -6,7 +6,7 @@ class ItemPosition(Enum):
     STARBOARD = 2
 
 class ManifestItem:
-    def __init__(self, coordinate:Coordinate, weight:int, title:str):
+    def __init__(self, coordinate: Coordinate, weight: int, title: str):
         self.coordinate = coordinate
         self.weight = weight
         self.title = title
@@ -39,7 +39,7 @@ class ManifestItem:
     def get_position(self) -> ItemPosition:
         return self.position
 
-    def set_coordinate(self, coordinate:Coordinate):
+    def set_coordinate(self, coordinate: Coordinate):
         self.coordinate = coordinate
 
     def directly_below(self, rhs):
