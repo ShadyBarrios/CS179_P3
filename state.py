@@ -1,7 +1,8 @@
+from action import Action
 from manifest import ManifestItem, ItemPosition
 from cell import CellTypes
+from copy import copy
 from utils import get_sides, get_weight_list, compare_weight_lists, calculate_weight
-from action import Action
 
 class State:
     def __init__(self, grid:list[list[ManifestItem]]):
@@ -41,6 +42,28 @@ class State:
     
         return (port_weight, starboard_weight)
     
+    def get_open_spots(self) -> list[ManifestItem]:
+        open_items = []
+        for row in range(self.row_count-1):
+            for col in range(self.col_count):
+                item = self.grid[row][col]
+                if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                    item_above = self.grid[row+1][col]
+                    if CellTypes.to_type(item_above.get_title()) == CellTypes.UNUSED:
+                        open_items.append(item_above)
+        return open_items
+
+    def get_movable_items(self) -> list[ManifestItem]:
+        movable_items = []
+        for row in range(self.row_count-1):
+            for col in range(self.col_count):
+                item = self.grid[row][col]
+                if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                    item_above = self.grid[row+1][col]
+                    if CellTypes.to_type(item_above.get_title()) == CellTypes.UNUSED:
+                        movable_items.append(item)
+        return movable_items
+
     # NAN layout must be mirror across port and starboard side
     def is_symmetric(self) -> bool:
         port_side, starboard_side = get_sides(self.grid)
@@ -110,9 +133,10 @@ class State:
 
         return mirrored_weights
     
-    def actions(self) -> list[Action]:
-        moveable_items = Action.get_moveable_items(self.grid)
-        open_spots = Action.get_open_spots(self.grid)
+    # calculates all the possible operations from the current state
+    def generate_actions(self) -> list[Action]:
+        moveable_items = self.get_movable_items()
+        open_spots = self.get_open_spots()
 
         actions = []
 
@@ -121,9 +145,20 @@ class State:
                 actions.append(Action(source, target))
         
         return actions
-    
+
+    # swaps coordinates of source and target, returns a new state
     def move(self, action:Action):
-        new_grid = action.execute_move(self.get_grid())
+        source = copy(action.source)
+        source_coordinate = source.get_coordinate()
+
+        target = copy(action.target)
+
+        source.set_coordinate(target.get_coordinate())
+        target.set_coordinate(source_coordinate)
+
+        new_grid = copy(self.grid)
+        new_grid[source.get_row()-1][source.get_col()-1] = source
+        new_grid[target.get_row()-1][target.get_col()-1] = target
 
         return State(new_grid)
     

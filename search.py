@@ -4,7 +4,7 @@ from solution import Solution
 from node import Node
 from queue import PriorityQueue
 
-def a_star_search(initial_state:Node) -> Solution:
+def a_star_search(initial_state: Node) -> Solution:
     frontier = PriorityQueue()
 
     # for fast lookup
