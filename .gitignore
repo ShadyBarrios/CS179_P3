@@ -85,3 +85,5 @@ CMakeLists.txt.user*
 .qtcreator/*
 CS179_P3.pyproject
 CS179_P3.pyproject.user
+
+tests/
