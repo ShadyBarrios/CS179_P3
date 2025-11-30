@@ -18,6 +18,14 @@ class State:
     def get_grid(self) -> list[list[ManifestItem]]:
         return self.grid
 
+    def get_num_used_cells(self) -> int:
+        used_count = 0
+        for row in self.grid:
+            for item in row:
+                used_count += int(CellTypes.to_type(item.get_title()) == CellTypes.USED)
+        
+        return used_count
+
     def get_weights(self) -> tuple[int, int]:
         port_weight = 0
         starboard_weight = 0
@@ -32,6 +40,40 @@ class State:
                     starboard_weight += item.get_weight()
     
         return (port_weight, starboard_weight)
+    
+    # NAN layout must be mirror across port and starboard side
+    def is_symmetric(self) -> bool:
+        port_side, starboard_side = get_sides(self.grid)
+        port_side_NANs = [] # FALSE not NAN, TRUE is NAN
+        starboard_side_NANs = [] # FALSE not NAN, TRUE is NAN
+
+        for row in port_side:
+            row.reverse()
+            for item in row:
+                port_side_NANs.append(CellTypes.to_type(item.get_title()) == CellTypes.NAN)
+
+        for row in starboard_side:
+            for item in row:
+                starboard_side_NANs.append(CellTypes.to_type(item.get_title()) == CellTypes.NAN)
+
+        return port_side_NANs == starboard_side_NANs
+
+    # no floating objects (USED ontop of UNUSED)
+    def is_physically_possible(self) -> bool:
+        row_count = self.get_row_count()
+        col_count = self.get_col_count()
+
+        for row in range(1,row_count):
+            for col in range(col_count):
+                if CellTypes.to_type(self.grid[row][col].get_title()) == CellTypes.USED:
+                    if CellTypes.to_type(self.grid[row-1][col].get_title()) == CellTypes.UNUSED:
+                        return False
+
+        return True
+
+    # will check if layout is legal (no floating cells and must be symmetric)
+    def valid_grid(self) -> bool:
+        return self.is_symmetric() and self.is_physically_possible()
     
     # hashes board for lookup
     def __hash__(self):
