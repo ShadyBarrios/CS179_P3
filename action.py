@@ -1,8 +1,13 @@
 from manifest import ManifestItem
 from cell import CellTypes
 from enum import Enum
-from utils import calculate_weight, copy_grid
+from utils import copy_grid
 
+class ActionTypes(Enum):
+    FromPark = 1
+    ToItem = 2
+    MoveItem = 3
+    ToPark = 4
 
 class Action:
     def __init__(self, source: ManifestItem, target: ManifestItem):
@@ -42,8 +47,9 @@ class Action:
                     moveable_items.append(item)
         return moveable_items
     
+    # TODO: UPDATE with action type for from and to park
     # moves source to target, replaces source with empty item (UNUSED)
-    def execute_move(self, grid:list[list[ManifestItem]]) -> list[list[ManifestItem]]:
+    def execute_move(self, grid:list[list[ManifestItem]], actionType:ActionTypes) -> list[list[ManifestItem]]:
         source_copy = self.source.copy()
         target_copy = self.target.copy()
 
@@ -61,9 +67,3 @@ class Action:
         
         return grid_copy
      
-    # TODO: need to do dummy search, can't phase through things
-    def manhattan_dist(self) -> int:
-        row_diff = abs(self.source.get_row() - self.target.get_row())
-        col_diff = abs(self.source.get_col() - self.target.get_col())
-
-        return (row_diff + col_diff)

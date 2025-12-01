@@ -1,6 +1,7 @@
 from enum import Enum
 from PySide6 import QtWidgets, QtCore
 from manifest import ManifestItem, ItemPosition
+from coordinate import Coordinate
 
 class TargetTypes(Enum):
     TARGET = 1
@@ -98,3 +99,19 @@ class Cell:
             background = self.item.get_position()
         
         return self.base_stylesheet + StyleBackgroundDict[background]
+    
+class ParkCell(Cell):
+    def __init__(self, parkLabel:QtWidgets.QLabel):
+        self.parkLabel = parkLabel
+        self.parkLabel.setText("CRANE")
+        self.coordinate = Coordinate
+        self.targetType = None
+        self.update(None)
+    
+    def update(self, status:TargetTypes):
+        stylesheet = self.base_stylesheet
+        if status == None or not(isinstance(status, TargetTypes)):
+            stylesheet += StyleBackgroundDict[ItemPosition.STARBOARD]
+        else:
+            stylesheet += StyleBackgroundDict[status]
+        self.parkLabel.setStyleSheet(stylesheet)

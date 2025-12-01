@@ -1,11 +1,13 @@
-from cell import Cell
+from cell import Cell, ParkCell
 from manifest import ManifestItem
 from state import State
+from PySide6 import QtWidgets
 
 class GridDisplay(State):
-    def __init__(self, grid: list[list[ManifestItem]]):
+    def __init__(self, grid: list[list[ManifestItem]], parkLabel:QtWidgets.QLabel):
         super().__init__(grid)
         self.cell_grid: list[list[Cell]] = []
+        self.parkCell = ParkCell(parkLabel)
         self.update()
 
     def update(self) -> None:

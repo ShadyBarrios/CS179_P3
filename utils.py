@@ -1,6 +1,6 @@
 from PySide6 import QtWidgets
 from manifest import ManifestItem
-from enum import Enum
+from node import CraneMoves
 from cell import CellTypes
 from pathlib import Path
     
@@ -112,3 +112,26 @@ def copy_grid(grid:list[list[ManifestItem]]) -> list[list[ManifestItem]]:
         grid_copy.append(copy_row)
 
     return grid_copy
+
+# think of it as FSM where source moves to target
+def manhattan_dist(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, target_row:int, target_col:int):
+    dist = 0
+    crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col)
+
+    while True:
+        match(crane_move):
+            # move right
+            case CraneMoves.MoveRight:
+                curr_col += 1
+            case CraneMoves.MoveLeft:
+                curr_col -= 1
+            case CraneMoves.MoveDown:
+                curr_row -= 1
+            case CraneMoves.MoveUp:
+                curr_row += 1
+            case CraneMoves.AtDest:
+                break
+        dist += 1
+        crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col)
+
+    return dist

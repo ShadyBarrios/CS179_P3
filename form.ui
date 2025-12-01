@@ -63,7 +63,7 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="ShipGridPage">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -163,20 +163,44 @@
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="ContinueLayout">
+            <layout class="QHBoxLayout" name="ParkLayout">
              <item>
-              <widget class="QPushButton" name="ContinueButton">
+              <widget class="QLabel" name="ParkLabel">
                <property name="text">
-                <string>Click</string>
+                <string>Park</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="WhenDoneLabel">
-               <property name="text">
-                <string>when done</string>
+              <spacer name="horizontalSpacer_10">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
-              </widget>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="ContinueLayout">
+               <item>
+                <widget class="QPushButton" name="ContinueButton">
+                 <property name="text">
+                  <string>Continue</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="WhenDoneLabel">
+                 <property name="text">
+                  <string>when done</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <spacer name="horizontalSpacer_8">

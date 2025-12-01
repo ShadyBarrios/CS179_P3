@@ -138,7 +138,7 @@ class Components():
 
     def init_ShipGrid(self, grid_parse: list[ManifestItem]):
         initial_state_grid = create_grid_from_list(grid_parse, self.row_count, self.col_count)
-        initial_state_grid_display = GridDisplay(initial_state_grid)
+        initial_state_grid_display = GridDisplay(initial_state_grid, self.ui.ParkLabel)
 
         for cell_row in initial_state_grid_display.cell_grid:
             for cell in cell_row:
@@ -154,6 +154,8 @@ class Components():
         message = f"{root_name} has {num_used_cells} containers\nComputing a solution..."
         self.display_message(message)
         self.show_all(self.ui.MessageLhsLayout)
+        self.show_all(self.ui.ParkLayout)
+        self.hide_all(self.ui.ContinueLayout)
 
     def display_message(self, message: str):
         self.ui.MessageLhsLabel.setText(message)

@@ -90,6 +90,17 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addLayout(self.MessageLhsLayout)
 
+        self.ParkLayout = QHBoxLayout()
+        self.ParkLayout.setObjectName(u"ParkLayout")
+        self.ParkLabel = QLabel(self.horizontalLayoutWidget_3)
+        self.ParkLabel.setObjectName(u"ParkLabel")
+
+        self.ParkLayout.addWidget(self.ParkLabel)
+
+        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.ParkLayout.addItem(self.horizontalSpacer_10)
+
         self.ContinueLayout = QHBoxLayout()
         self.ContinueLayout.setObjectName(u"ContinueLayout")
         self.ContinueButton = QPushButton(self.horizontalLayoutWidget_3)
@@ -102,12 +113,15 @@ class Ui_MainWindow(object):
 
         self.ContinueLayout.addWidget(self.WhenDoneLabel)
 
+
+        self.ParkLayout.addLayout(self.ContinueLayout)
+
         self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.ContinueLayout.addItem(self.horizontalSpacer_8)
+        self.ParkLayout.addItem(self.horizontalSpacer_8)
 
 
-        self.verticalLayout_4.addLayout(self.ContinueLayout)
+        self.verticalLayout_4.addLayout(self.ParkLayout)
 
 
         self.MessagesLhsLayout.addLayout(self.verticalLayout_4)
@@ -220,7 +234,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.AllPages.setCurrentIndex(2)
+        self.AllPages.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -229,7 +243,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Keogh's Port App by CyberSmiths", None))
         self.MessageLhsLabel.setText(QCoreApplication.translate("MainWindow", u"LHS Message", None))
-        self.ContinueButton.setText(QCoreApplication.translate("MainWindow", u"Click", None))
+        self.ParkLabel.setText(QCoreApplication.translate("MainWindow", u"Park", None))
+        self.ContinueButton.setText(QCoreApplication.translate("MainWindow", u"Continue", None))
         self.WhenDoneLabel.setText(QCoreApplication.translate("MainWindow", u"when done", None))
         self.MoveHistoryLabel.setText(QCoreApplication.translate("MainWindow", u"Move History:", None))
         self.PreviousMovesLabel.setText(QCoreApplication.translate("MainWindow", u"Previous Moves", None))

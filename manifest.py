@@ -8,10 +8,13 @@ class ItemPosition(Enum):
 class ManifestItem:
     def __init__(self, coordinate: Coordinate, weight: int, title: str):
         self.coordinate = coordinate
-        self.weight = weight
-        self.title = title
+        self.weight = 0 if self.is_park() else weight
+        self.title = "PARK" if self.is_park() else title
         self.position = ItemPosition.PORT if coordinate.get_col() <= 6 else ItemPosition.STARBOARD
 
+    def is_park(self) -> bool:
+        return self.coordinate == Coordinate(9,1)
+    
     def copy(self):
         return ManifestItem(self.coordinate.copy(), self.weight, self.title)
     

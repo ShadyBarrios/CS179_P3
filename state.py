@@ -1,14 +1,15 @@
-from action import Action
+from action import Action, ActionTypes
 from manifest import ManifestItem, ItemPosition
 from cell import CellTypes
-from copy import copy
+from coordinate import Coordinate
 from utils import get_sides, get_weight_list, compare_weight_lists, calculate_weight, compare_str_lists, copy_grid
 
 class State:
-    def __init__(self, grid: list[list[ManifestItem]]):
+    def __init__(self, grid: list[list[ManifestItem]], crane:Coordinate=Coordinate(9,1)):
         self.row_count = 8
         self.col_count = 12
         self.grid = grid
+        self.crane = crane
     
     def __str__(self) -> str:
         output = ""
@@ -18,8 +19,12 @@ class State:
                 output += str(item.get_weight()) + " "
             output += "\n"
         return output
+    
     def copy(self):
         return State(copy_grid(self.grid))
+    
+    def get_crane(self) -> Coordinate:
+        return self.crane
     
     def get_row_count(self) -> int:
         return self.row_count
@@ -109,7 +114,9 @@ class State:
         same_weights = State.compare_weights(this_port, this_starboard, rhs_port, rhs_starboard)
         same_moveable_objects = State.compare_moveable_objects(this_port, this_starboard, rhs_port, rhs_starboard)
         
-        return same_weights and same_moveable_objects
+        same_crane_position = self.get_crane() == rhs.get_crane()
+
+        return same_weights and same_moveable_objects and same_crane_position
     
     # compares to see that both grids have the same weights on the same sides (or mirrored)
     def compare_weights(lhs_port, lhs_starboard, rhs_port, rhs_starboard) -> bool:
@@ -147,8 +154,13 @@ class State:
 
         return normal or mirrored
     
-    # calculates all the possible operations from the current state
-    def generate_actions(self) -> list[Action]:
+    # calculates all the possible operations from the current state, based on actionType
+    # TODO: update with action type
+    def generate_actions(self, actionType:ActionTypes) -> list[Action]:
+
+        # match(actionType):
+        #     case ActionTypes.FromPark:
+
         moveable_items = self.get_moveable_items()
         open_spots = self.get_open_spots()
 
@@ -164,7 +176,8 @@ class State:
 
     # swaps coordinates of source and target, returns a new state
     def move(self, action:Action):
-        return State(action.execute_move(self.get_grid()))
+        new_crane = action.target.get_coordinate().copy()
+        return State(action.execute_move(self.get_grid()), new_crane)
     
     # criteria b: |Ph - Sh| < (Sum(Po, So) * 0.10), so expected is |Ph-Sh| > (Sum(Po, So) * 0.1) therefore |Ph - Sh| - (sum(Po, So) * 10) > 0
     # therefore, an admissible heurstic would be |Ph - Sh| - (sum(Po, So) * 10)

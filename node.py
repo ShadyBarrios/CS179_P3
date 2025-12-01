@@ -1,16 +1,19 @@
-from action import Action
+from action import Action, ActionTypes
 from manifest import ManifestItem
 from state import State
-from utils import get_sides, calculate_weight
+from utils import manhattan_dist
+from coordinate import Coordinate
 
 class Node:
-    def __init__(self, grid: list[list[ManifestItem]], cost: int=0, heuristic: float=0, action: Action=None, children=None, parent=None):
-        self.state = State(grid)
+    def __init__(self, grid: list[list[ManifestItem]], cost: int=0, heuristic: float=0, action: Action=None, children=None, parent=None, crane=Coordinate(9,1), actionType = ActionTypes.FromPark):
+        self.state = State(grid, crane)
         self.cost = cost # g(n)
         self.heuristic = heuristic # h(n)
         self.action = action
         self.children = children
         self.parent = parent
+        self.actionType = actionType
+        self.crane = crane
 
         self.row_count = 8
         self.col_count = 12
@@ -21,6 +24,15 @@ class Node:
             return False
         
         return self.get_total_cost() < rhs.get_total_cost()
+
+    def next_action_type(self) -> ActionTypes:
+        match(self.actionType):
+            case ActionTypes.FromPark:
+                return ActionTypes.ToItem
+            case ActionTypes.ToItem:
+                return ActionTypes.MoveItem
+            case ActionTypes.MoveItem:
+                return ActionTypes.ToItem
     
     def get_weights(self) -> tuple[int, int]:
         return self.state.get_weights()
@@ -31,6 +43,9 @@ class Node:
 
     def get_cost(self) -> int:
         return self.cost
+    
+    def add_cost(self, cost:int):
+        self.cost += cost
 
     def get_heuristic(self) -> float:
         return self.heuristic
@@ -53,13 +68,22 @@ class Node:
         children:list[Node] = []
 
         current_state = self.get_state()
+        next_action = self.next_action_type()
 
         for action in current_state.generate_actions():
             new_state = current_state.move(action)
+            crane = new_state.get_crane().copy()
             heuristic = new_state.calculate_heuristic()
-            node = Node(new_state.get_grid(), (self.cost + action.manhattan_dist()), heuristic, action, parent=self)
+            node = Node(new_state.get_grid(), self.cost, heuristic, action, children=None, parent=self, crane=crane, actionType=next_action)
+            node.add_cost(node.manhattan_dist())
             children.append(node)
         return children
+    
+    def is_goal_state(self) -> bool:
+        criteria_b = self.get_state().meets_criteria_b()
+        crane_parked = self.get_state().get_crane() == Coordinate(9,1)
+
+        return criteria_b and crane_parked
     
     def meets_criteria_b(self) -> bool:
         return self.get_state().meets_criteria_b()
@@ -68,10 +92,22 @@ class Node:
         port_side_weight, starboard_side_weight = self.get_state().get_side_weights()
         return abs(port_side_weight - starboard_side_weight)
     
+    def manhattan_dist(self) -> int:
+        action = self.get_action()
+        state = self.get_state()
+        grid = state.get_grid()
 
-    
-
-
+        # - 1 for idx
+        curr_row = action.source.get_row() - 1
+        curr_col = action.source.get_col() - 1
+        target_row = action.target.get_row() - 1
+        target_col = action.target.get_col() - 1
         
-            
-
+        dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col)
+        return dist
+    
+    def to_park(self):
+        state = self.get_state()
+        cost = manhattan_dist(state.get_grid())
+        to_park = Node(state.get_grid(), )
+        pass

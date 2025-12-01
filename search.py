@@ -33,7 +33,7 @@ class Search():
             # print(f"Chose {node.get_action()} | {node.meets_criteria_b()}")
             node_weight_diff = node.get_weight_diff()
             
-            if node.meets_criteria_b():
+            if node.is_goal_state():
                 return Solution(node)
             
             # since our heuristic is admissible and uses weight diff ((total weight * 10) - weight diff)
