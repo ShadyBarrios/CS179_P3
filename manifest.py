@@ -21,6 +21,9 @@ class ManifestItem:
             return False
         return ((self.get_coordinate() == rhs.get_coordinate()) and (self.get_weight() == rhs.get_weight()))
     
+    def __hash__(self) -> int:
+        return hash((self.coordinate, self.weight))
+
     def get_coordinate(self) -> Coordinate:
         return self.coordinate
     
@@ -51,5 +54,5 @@ class ManifestItem:
         row_under = (self.get_coordinate().get_row() == (rhs.get_coordinate().get_row() - 1))
         return (same_col and row_under)
     
-    def empty_item(coordinate:Coordinate):
+    def empty_item(coordinate: Coordinate):
         return ManifestItem(coordinate, 0, "UNUSED")

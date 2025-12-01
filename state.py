@@ -1,8 +1,8 @@
+import copy
+
 from action import Action
 from manifest import ManifestItem, ItemPosition
 from cell import CellTypes
-# from copy import copy
-# from utils import get_weight_list, compare_weight_lists, compare_str_lists
 
 class State:
     def __init__(self, grid: list[list[ManifestItem]]):
@@ -43,16 +43,15 @@ class State:
         port_weight = 0
         starboard_weight = 0
 
-        for row in self.grid:
-            for item in row:
-                if CellTypes.to_type(item.get_title()) != CellTypes.USED:
-                    continue
-                if item.get_position() == ItemPosition.PORT:
+        for row in range(self.row_count):
+            for col in range(self.col_count):
+                item = self.grid[row][col]
+                if col < 6:
                     port_weight += item.get_weight()
                 else:
                     starboard_weight += item.get_weight()
     
-        return (port_weight, starboard_weight)
+        return port_weight, starboard_weight
     
     # split grid into two lists, port and starboard (port, starboard)
     def get_sides(self) -> tuple[list[list[ManifestItem]], list[list[ManifestItem]]]:
@@ -63,20 +62,85 @@ class State:
             port_side_row = []
             starboard_side_row = []
             for col in range(self.col_count):
+                item = self.grid[row][col]
                 if col < 6:
-                    port_side_row.append(self.grid[row][col])
+                    port_side_row.append(item)
                 else:
-                    starboard_side_row.append(self.grid[row][col])
+                    starboard_side_row.append(item)
             port_side.append(port_side_row)
             starboard_side.append(starboard_side_row)
         
         return port_side, starboard_side
 
+    # Get columns of weights for a specific grid
+    def _get_weight_list(grid: list[list[ManifestItem]]) -> list[list[int]]:
+        weights = []
+        row_count = len(grid)
+        col_count = len(grid[0])
+
+        for col in range(col_count):
+            col_weights = []
+            for row in range(row_count):
+                item = grid[row][col]
+                if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                    col_weights.append(item.get_weight())
+            if len(col_weights) > 0:
+                weights.append(col_weights)
+
+        return weights
+    
+    def get_side_weight_lists(self) -> tuple[list[list[int]], list[list[int]]]:
+        port_weights = []
+        starboard_weights = []
+
+        for col in range(self.col_count):
+            port_col_weights = []
+            starboard_col_weights = []
+            for row in range(self.row_count):
+                item = self.grid[row][col]
+                if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                    if col < 6:
+                        port_col_weights.append(item.get_weight())
+                    else:
+                        starboard_col_weights.append(item.get_weight())
+            if port_col_weights:
+                port_weights.append(port_col_weights)
+            if starboard_col_weights:
+                starboard_weights.append(starboard_col_weights)
+
+        return port_weights, starboard_weights
+
+    
+    # Get movable items for a specific grid
+    def _get_movable_items(grid: list[list[ManifestItem]]) -> list[ManifestItem]:
+        moveable_items: list[ManifestItem] = []
+        row_count = len(grid)
+        col_count = len(grid[0])
+
+        for row in range(row_count):
+            for col in range(col_count):
+                item = grid[row][col]
+                item_type = CellTypes.to_type(item.get_title())
+                item_above_type = CellTypes.UNUSED if row == 7 else CellTypes.to_type(grid[row+1][col].get_title())
+                if item_type == CellTypes.USED and item_above_type == CellTypes.UNUSED:
+                    moveable_items.append(item)
+        return moveable_items
+    
     def get_open_spots(self) -> list[ManifestItem]:
-        return Action.get_open_spots(self.get_grid())
+        open_spots: list[ManifestItem] = []
+
+        for row in range(self.row_count):
+            for col in range(self.col_count):
+                item = self.grid[row][col]
+                item_type = CellTypes.to_type(item.get_title())
+                item_below_type = CellTypes.USED if row == 0 else CellTypes.to_type(self.grid[row-1][col].get_title())
+                if item_type == CellTypes.UNUSED and item_below_type != CellTypes.UNUSED:
+                    open_spots.append(item)
+
+        return open_spots
     
     def get_moveable_items(self) -> list[ManifestItem]:
-        return Action.get_moveable_items(self.get_grid())
+        return State._get_movable_items(self.grid)
 
     def get_num_used_cells(self) -> int:
         used_count = 0
@@ -126,50 +190,54 @@ class State:
     def __eq__(self, rhs):
         if not isinstance(rhs, State):
             return False
-
-        this_port, this_starboard = self.get_sides()
-        rhs_port, rhs_starboard = rhs.get_sides()
-
-        exactly_same = (this_port == rhs_port and this_starboard == rhs_starboard)
-        mirrored_same = (this_port == rhs_starboard and this_starboard == rhs_port)
-
-        return exactly_same or mirrored_same
+        column_equality = self.__compare_weight_columns__(rhs)
+        return column_equality
     
-    # # compares to see that both grids have the same weights on the same sides (or mirrored)
-    # def compare_weights(lhs_port, lhs_starboard, rhs_port, rhs_starboard) -> bool:
-    #     lhs_port_weights = get_weight_list(lhs_port)
-    #     lhs_starboard_weights = get_weight_list(lhs_starboard)
-    #     rhs_port_weights = get_weight_list(rhs_port)
-    #     rhs_starboard_weights = get_weight_list(rhs_starboard)
+    # compares to see that both grids have the same weight columns on the same sides (or mirrored)
+    def __compare_weight_columns__(self, rhs) -> bool:
+        if not isinstance(rhs, State):
+            return False
 
-    #     port = compare_weight_lists(lhs_port_weights, rhs_port_weights)
-    #     starboard = compare_weight_lists(lhs_starboard_weights, rhs_starboard_weights)
-    #     normal = port and starboard
+        lhs_port_weights, lhs_starboard_weights = self.get_side_weight_lists()
+        rhs_port_weights, rhs_starboard_weights = rhs.get_side_weight_lists()
 
-    #     # the grid can also be considered equal if they mirror each other
-    #     port_mirrored = compare_weight_lists(lhs_port_weights, rhs_starboard_weights)
-    #     # split for readability (too long of a line)
-    #     starboard_mirrored = compare_weight_lists(lhs_starboard_weights, rhs_port_weights)
-    #     mirrored = port_mirrored and starboard_mirrored
+        lhs_port_weights_sorted, lhs_starboard_weights_sorted = sorted(lhs_port_weights), sorted(lhs_starboard_weights)
+        rhs_port_weights_sorted, rhs_starboard_weights_sorted = sorted(rhs_port_weights), sorted(rhs_starboard_weights)
+        
+        port_equality = (lhs_port_weights_sorted == rhs_port_weights_sorted)
+        starboard_equality = (lhs_starboard_weights_sorted == rhs_starboard_weights_sorted)
+        port_equality_mirrored = (lhs_port_weights_sorted == rhs_starboard_weights_sorted)
+        starboard_equality_mirrored = (lhs_starboard_weights_sorted == rhs_port_weights_sorted)
 
-    #     return normal or mirrored
+        equal_columns = port_equality and starboard_equality 
+        equal_columns_mirrored = port_equality_mirrored and starboard_equality_mirrored
 
-    # # compares to see that both grids have the same moveable objects on the same sides (or mirrored)
-    # def compare_moveable_objects(lhs_port, lhs_starboard, rhs_port, rhs_starboard) -> bool:
-    #     lhs_port_moveable_objects = [item.get_title() for item in Action.get_moveable_items(lhs_port)]
-    #     lhs_starboard_moveable_objects = [item.get_title() for item in Action.get_moveable_items(lhs_starboard)]
-    #     rhs_port_moveable_objects = [item.get_title() for item in Action.get_moveable_items(rhs_port)]
-    #     rhs_starboard_moveable_objects = [item.get_title() for item in Action.get_moveable_items(rhs_starboard)]
 
-    #     port = compare_str_lists(lhs_port_moveable_objects, rhs_port_moveable_objects)
-    #     starboard = compare_str_lists(lhs_starboard_moveable_objects, rhs_starboard_moveable_objects)
-    #     normal = port and starboard
+        return equal_columns or equal_columns_mirrored
 
-    #     port_mirrored = compare_str_lists(lhs_port_moveable_objects, rhs_starboard_moveable_objects)
-    #     starboard_mirrored = compare_str_lists(lhs_starboard_moveable_objects, rhs_port_moveable_objects)
-    #     mirrored = port_mirrored and starboard_mirrored
+    # # Compares if both grids have the same movable items
+    # # Not needed?
+    # def __compare_movable_items__(self, rhs) -> bool:
+    #     if not isinstance(rhs, State):
+    #         return False
+        
+    #     lhs_port, lhs_starboard = self.get_sides()
+    #     rhs_port, rhs_starboard = rhs.get_sides()
 
-    #     return normal or mirrored
+    #     lhs_port_movable = {item for item in State._get_movable_items(lhs_port)}
+    #     lhs_starboard_movable = {item for item in State._get_movable_items(lhs_starboard)}
+    #     rhs_port_movable = {item for item in State._get_movable_items(rhs_port)}
+    #     rhs_starboard_movable = {item for item in State._get_movable_items(rhs_starboard)}
+
+    #     port_equality = (lhs_port_movable == rhs_port_movable)
+    #     starboard_equality = (lhs_starboard_movable == rhs_starboard_movable)
+    #     port_equality_mirrored = (lhs_port_movable == rhs_starboard_movable)
+    #     starboard_equality_mirrored = (lhs_starboard_movable == rhs_port_movable)
+        
+    #     equal_movable = port_equality and starboard_equality
+    #     equal_movable_mirrored = port_equality_mirrored and starboard_equality_mirrored
+
+    #     return equal_movable or equal_movable_mirrored
     
     # calculates all the possible operations from the current state
     def generate_actions(self) -> list[Action]:
@@ -187,17 +255,31 @@ class State:
         return actions
 
     # swaps coordinates of source and target, returns a new state
-    def move(self, action:Action):
-        return State(action.execute_move(self.get_grid()))
+    def move(self, action: Action):
+        source = action.source.copy()
+        target = action.target.copy()
+
+        source_coordinate = source.get_coordinate().copy()
+        target_coordinate = target.get_coordinate().copy()
+
+        updated_grid = copy.deepcopy(self.grid)
+
+        # moves source object to target object
+        updated_grid[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source
+        # update new target object's coordinates
+        updated_grid[target_coordinate.get_row()-1][target_coordinate.get_col()-1].set_coordinate(target_coordinate)
+        # update old source coordinate with empty object
+        updated_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
+        
+        return State(updated_grid)
     
     # criteria b: |Ph - Sh| < (Sum(Po, So) * 0.10), so expected is |Ph-Sh| > (Sum(Po, So) * 0.1) therefore |Ph - Sh| - (sum(Po, So) * 10) > 0
     # therefore, an admissible heurstic would be |Ph - Sh| - (sum(Po, So) * 10)
     # however, this could be negative (when goal met) and h(n) must be >= 0, so h(n) = max(0, |Ph - Sh| - (sum(Po, So) * 10))
     def calculate_heuristic(self) -> float:
-        criteria_b_calc = self.criteria_b()
-        return max(0, criteria_b_calc)
+        return max(0, self.calculate_criteria_b())
 
-    def criteria_b(self) -> float:
+    def calculate_criteria_b(self) -> float:
         port_side_weight, starboard_side_weight = self.get_side_weights()
 
         side_diff = abs(port_side_weight - starboard_side_weight)
@@ -206,6 +288,5 @@ class State:
     
     # criteria b: |Ph - Sh| < (Sum(Po, So) * 0.10) therefore |Ph - Sh| - (sum(Po, So) * 10) < 0
     def meets_criteria_b(self) -> bool:
-        criteria_b_calc = self.criteria_b()
-        return (criteria_b_calc < 0)
+        return (self.calculate_criteria_b() < 0)
 

@@ -30,7 +30,7 @@ class Search():
         while not frontier.empty():
             node:Node = frontier.get()
             
-            # print(f"Chose {node.get_action()} | {node.meets_criteria_b()}")
+            print(f"Chose {node.get_action()} | {node.meets_criteria_b()}")
             node_weight_diff = node.get_weight_diff()
             
             if node.meets_criteria_b():
