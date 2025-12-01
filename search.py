@@ -66,4 +66,5 @@ class Search():
             # break
 
         # if full frontier examined then that means last node is minimum
+        print('uhoh')
         return Solution(node_bsf.to_park())

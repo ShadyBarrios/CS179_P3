@@ -112,7 +112,6 @@ class Components():
     @QtCore.Slot(Solution)
     def solution_found(self, solution):
         print(f"Hi outside of thread... solution:\n{solution}")
-        self.restart()
 
     def hide_all(self, parentLayout: QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
