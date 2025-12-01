@@ -105,7 +105,7 @@ def compare_str_lists(list_one:list[str], list_two:list[str]) -> bool:
     return len(list_two) == 0
 
 # think of it as FSM where source moves to target
-def manhattan_dist(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, target_row:int, target_col:int, actionType:ActionTypes):
+def manhattan_dist(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, target_row:int, target_col:int):
     dist = 0 
     crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col)
 

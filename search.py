@@ -23,45 +23,41 @@ class Search():
 
         start_state = self.initial_state.copy()
         start = Node(start_state.get_grid(), cost=0, heuristic=start_state.calculate_heuristic())
-
+        print(f"Chose {start.get_action()} | {start.actionType} | {start.get_weight_diff()} | {start.meets_criteria_b()}")
         frontier.put(start)
-        frontier_list.append(start.get_state())
+        frontier_list.append(start)
 
         while not frontier.empty():
             node:Node = frontier.get()
-
-            print(f"Chose {node.get_action()} | {node.actionType}")
             
-            # print(f"Chose {node.get_action()} | {node.meets_criteria_b()}")
+            # print(f"Chose {node.get_action()} | {node.actionType} | {node.get_weight_diff()}")
             node_weight_diff = node.get_weight_diff()
             
             if node.is_goal_state():
                 return Solution(node)
             
-            # since our heuristic is admissible and uses weight diff ((total weight * 10) - weight diff)
-            #   if weight diff is increasing then that means that we have found a minimum
+            # # since our heuristic is admissible and uses weight diff ((total weight * 10) - weight diff)
+            # #   if weight diff is increasing then that means that we have found a minimum
             if node_weight_diff > node_bsf_weight_diff:
-                return Solution(node_bsf)
+                return Solution(node_bsf.to_park())
 
             # since time matters we only consider it bsf if its explicity <, not <=
             if node_weight_diff < node_bsf_weight_diff:
                 node_bsf_weight_diff = node_weight_diff
                 node_bsf = node
 
-            frontier_list.remove(node.get_state())
-            explored.append(node.get_state())
+            frontier_list.remove(node)
+            explored.append(node)
 
             # expand node and then add to frontier
             child:Node = None
             for child in sorted(node.generate_children()):
-                child_state = child.get_state()
-
                 # if first_run:
                 #     print(f"{child.get_action()} | {child.get_total_cost()} | {child.get_heuristic()}")
-
-                if child_state not in explored and child_state not in frontier_list:
+               
+                if child not in explored and child not in frontier_list:
                     frontier.put(child)
-                    frontier_list.append(child.get_state())
+                    frontier_list.append(child)
             #         if first_run:
             #             print(f"ADDED: {child.get_action()} | {child.get_total_cost()} | {child.get_heuristic()}")
                         
@@ -70,4 +66,4 @@ class Search():
             # break
 
         # if full frontier examined then that means last node is minimum
-        return Solution(node_bsf)
+        return Solution(node_bsf.to_park())

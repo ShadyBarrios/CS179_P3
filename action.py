@@ -49,18 +49,17 @@ class Action:
     # TODO: UPDATE with action type for from and to park
     # moves source to target, replaces source with empty item (UNUSED)
     def execute_move(self, grid:list[list[ManifestItem]], actionType:ActionTypes) -> list[list[ManifestItem]]:
-        source_copy = self.source.copy()
-        target_copy = self.target.copy()
         grid_copy = copy_grid(grid)
-        source_coordinate = source_copy.get_coordinate().copy()
-        target_coordinate = target_copy.get_coordinate().copy()
 
         match(actionType):
             case ActionTypes.FromPark:
-                return grid
+                return grid_copy
             case ActionTypes.ToItem:
-                return grid
+                return grid_copy
             case ActionTypes.MoveItem:
+                source_coordinate = self.source.get_coordinate().copy()
+                target_coordinate = self.target.get_coordinate().copy()
+                source_copy = grid_copy[source_coordinate.get_row()-1][source_coordinate.get_col()-1].copy()
                 # moves source object to target object
                 grid_copy[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source_copy
                 # update new target object's coordinates
@@ -68,7 +67,7 @@ class Action:
                 # update old source coordinate with empty object
                 grid_copy[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
             case ActionTypes.ToPark:
-                return grid
+                return grid_copy
 
         return grid_copy
      

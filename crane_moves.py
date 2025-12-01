@@ -11,7 +11,8 @@ class CraneMoves(Enum):
     AtDest = 5 # crane is at dest
 
     def calculate_move(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, target_row:int, target_col:int):
-        if (curr_row == target_row) and (curr_col == target_col):
+        print(f"{curr_row} {curr_col} | {target_row} {target_col}")
+        if (curr_row == target_row+1) and (curr_col == target_col):
             return CraneMoves.AtDest
         
         if (curr_row > target_row) and (curr_col == target_col): # crane is above

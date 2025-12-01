@@ -14,9 +14,17 @@ class Node:
         self.parent = parent
         self.actionType = actionType
         self.crane = crane
-
         self.row_count = 8
         self.col_count = 12
+
+    def __eq__(self, rhs):
+        if not(isinstance(rhs, Node)):
+            return False
+
+        comp_states = self.state == rhs.state
+        comp_actions = self.actionType == rhs.actionType
+
+        return (comp_states and comp_actions)
     
     def __lt__(self, rhs):
         if not(isinstance(rhs, Node)):
@@ -24,6 +32,16 @@ class Node:
             return False
         
         return self.get_total_cost() < rhs.get_total_cost()
+    
+    def to_park(self):
+        current_state = self.get_state()
+        action = current_state.generate_actions(ActionTypes.ToPark)[0] # returns 1
+        new_state = current_state.move(action, ActionTypes.ToPark)
+        crane = action.target.get_coordinate().copy()
+        heuristic = new_state.calculate_heuristic()
+        node = Node(new_state.get_grid(), self.cost, heuristic, action, children=None, parent=self, crane=crane, actionType=ActionTypes.ToPark)
+        node.add_cost(node.manhattan_dist())
+        return node  
 
     def next_action_type(self) -> ActionTypes:
         if self.meets_criteria_b():
@@ -72,16 +90,15 @@ class Node:
         children:list[Node] = []
 
         current_state = self.get_state()
-        next_action = self.next_action_type()
 
         action:Action = None
         next_action_type = self.next_action_type()
-        actions = current_state.generate_actions(next_action)
+        actions = current_state.generate_actions(next_action_type)
         for action in actions:
             new_state = current_state.move(action, next_action_type)
             crane = action.target.get_coordinate().copy()
             heuristic = new_state.calculate_heuristic()
-            node = Node(new_state.get_grid(), self.cost, heuristic, action, children=None, parent=self, crane=crane, actionType=next_action)
+            node = Node(new_state.get_grid(), self.cost, heuristic, action, children=None, parent=self, crane=crane, actionType=next_action_type)
             node.add_cost(node.manhattan_dist())
             children.append(node)
         return children
@@ -110,7 +127,8 @@ class Node:
         target_row = action.target.get_row() - 1
         target_col = action.target.get_col() - 1
         
-        dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col, self.actionType)
+        print("calc distance")
+        dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col)
         return dist
     
     # def to_park(self):
