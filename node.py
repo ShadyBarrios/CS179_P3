@@ -45,6 +45,7 @@ class Node:
 
     def next_action_type(self) -> ActionTypes:
         if self.meets_criteria_b():
+            print(f"Met by {self.get_action()}")
             return ActionTypes.ToPark
 
         match(self.actionType):
@@ -127,7 +128,6 @@ class Node:
         target_row = action.target.get_row() - 1
         target_col = action.target.get_col() - 1
         
-        print("calc distance")
         dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col)
         return dist
     

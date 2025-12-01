@@ -170,13 +170,13 @@ class State:
                 crane_item = ManifestItem(self.crane, 0, "CRANE")
                 moveable_items = self.get_moveable_items()
                 for target in moveable_items:
+                    if target.get_coordinate() == crane_item.get_coordinate():
+                        continue
                     actions.append(Action(crane_item, target))
             case ActionTypes.MoveItem:
                 crane_item = ManifestItem(self.crane, 0, "CRANE")
                 open_spots = self.get_open_spots()
                 for target in open_spots:
-                    if target == Coordinate(7,1):
-                        print(f"{crane_item} {target}")
                     if crane_item.directly_below(target):
                         continue
                     actions.append(Action(crane_item, target))

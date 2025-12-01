@@ -23,14 +23,14 @@ class Search():
 
         start_state = self.initial_state.copy()
         start = Node(start_state.get_grid(), cost=0, heuristic=start_state.calculate_heuristic())
-        print(f"Chose {start.get_action()} | {start.actionType} | {start.get_weight_diff()} | {start.meets_criteria_b()}")
+        print(f"Chose {start.get_action()} | {start.actionType} | {start.get_weight_diff()} | {start.meets_criteria_b()} | {start.get_total_cost()}")
         frontier.put(start)
         frontier_list.append(start)
 
         while not frontier.empty():
             node:Node = frontier.get()
             
-            # print(f"Chose {node.get_action()} | {node.actionType} | {node.get_weight_diff()}")
+            print(f"Chose {node.get_action()} | {node.actionType} | {node.get_weight_diff()} | {node.get_total_cost()}")
             node_weight_diff = node.get_weight_diff()
             
             if node.is_goal_state():
@@ -39,6 +39,7 @@ class Search():
             # # since our heuristic is admissible and uses weight diff ((total weight * 10) - weight diff)
             # #   if weight diff is increasing then that means that we have found a minimum
             if node_weight_diff > node_bsf_weight_diff:
+                print("woof")
                 return Solution(node_bsf.to_park())
 
             # since time matters we only consider it bsf if its explicity <, not <=
