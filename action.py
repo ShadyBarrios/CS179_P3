@@ -1,7 +1,6 @@
 from manifest import ManifestItem
 from cell import CellTypes
 from enum import Enum
-from utils import copy_grid
 
 class ActionTypes(Enum):
     FromPark = 1
@@ -52,18 +51,33 @@ class Action:
     def execute_move(self, grid:list[list[ManifestItem]], actionType:ActionTypes) -> list[list[ManifestItem]]:
         source_copy = self.source.copy()
         target_copy = self.target.copy()
-
         grid_copy = copy_grid(grid)
-
         source_coordinate = source_copy.get_coordinate().copy()
         target_coordinate = target_copy.get_coordinate().copy()
 
-        # moves source object to target object
-        grid_copy[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source_copy
-        # update new target object's coordinates
-        grid_copy[target_coordinate.get_row()-1][target_coordinate.get_col()-1].set_coordinate(target_coordinate)
-        # update old source coordinate with empty object
-        grid_copy[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
-        
+        match(actionType):
+            case ActionTypes.FromPark:
+                return grid
+            case ActionTypes.ToItem:
+                return grid
+            case ActionTypes.MoveItem:
+                # moves source object to target object
+                grid_copy[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source_copy
+                # update new target object's coordinates
+                grid_copy[target_coordinate.get_row()-1][target_coordinate.get_col()-1].set_coordinate(target_coordinate)
+                # update old source coordinate with empty object
+                grid_copy[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
+            case ActionTypes.ToPark:
+                return grid
+
         return grid_copy
      
+def copy_grid(grid:list[list[ManifestItem]]) -> list[list[ManifestItem]]:
+    grid_copy:list[list[ManifestItem]] = []
+    for row in grid:
+        copy_row:list[ManifestItem] = []
+        for item in row:
+            copy_row.append(item.copy())
+        grid_copy.append(copy_row)
+
+    return grid_copy

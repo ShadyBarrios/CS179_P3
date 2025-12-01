@@ -1,9 +1,10 @@
 from PySide6 import QtWidgets
 from manifest import ManifestItem
-from node import CraneMoves
+from crane_moves import CraneMoves
 from cell import CellTypes
 from pathlib import Path
-    
+from action import ActionTypes
+
 def get_all_children_items(item) -> list[QtWidgets.QWidget]:
     children = []
 
@@ -103,19 +104,9 @@ def compare_str_lists(list_one:list[str], list_two:list[str]) -> bool:
     
     return len(list_two) == 0
 
-def copy_grid(grid:list[list[ManifestItem]]) -> list[list[ManifestItem]]:
-    grid_copy:list[list[ManifestItem]] = []
-    for row in grid:
-        copy_row:list[ManifestItem] = []
-        for item in row:
-            copy_row.append(item.copy())
-        grid_copy.append(copy_row)
-
-    return grid_copy
-
 # think of it as FSM where source moves to target
-def manhattan_dist(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, target_row:int, target_col:int):
-    dist = 0
+def manhattan_dist(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, target_row:int, target_col:int, actionType:ActionTypes):
+    dist = 0 
     crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col)
 
     while True:
@@ -133,5 +124,5 @@ def manhattan_dist(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, ta
                 break
         dist += 1
         crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col)
-
+    
     return dist

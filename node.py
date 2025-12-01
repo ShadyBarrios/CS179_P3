@@ -26,6 +26,9 @@ class Node:
         return self.get_total_cost() < rhs.get_total_cost()
 
     def next_action_type(self) -> ActionTypes:
+        if self.meets_criteria_b():
+            return ActionTypes.ToPark
+
         match(self.actionType):
             case ActionTypes.FromPark:
                 return ActionTypes.ToItem
@@ -33,6 +36,7 @@ class Node:
                 return ActionTypes.MoveItem
             case ActionTypes.MoveItem:
                 return ActionTypes.ToItem
+            
     
     def get_weights(self) -> tuple[int, int]:
         return self.state.get_weights()
@@ -70,9 +74,12 @@ class Node:
         current_state = self.get_state()
         next_action = self.next_action_type()
 
-        for action in current_state.generate_actions():
-            new_state = current_state.move(action)
-            crane = new_state.get_crane().copy()
+        action:Action = None
+        next_action_type = self.next_action_type()
+        actions = current_state.generate_actions(next_action)
+        for action in actions:
+            new_state = current_state.move(action, next_action_type)
+            crane = action.target.get_coordinate().copy()
             heuristic = new_state.calculate_heuristic()
             node = Node(new_state.get_grid(), self.cost, heuristic, action, children=None, parent=self, crane=crane, actionType=next_action)
             node.add_cost(node.manhattan_dist())
@@ -103,11 +110,11 @@ class Node:
         target_row = action.target.get_row() - 1
         target_col = action.target.get_col() - 1
         
-        dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col)
+        dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col, self.actionType)
         return dist
     
-    def to_park(self):
-        state = self.get_state()
-        cost = manhattan_dist(state.get_grid())
-        to_park = Node(state.get_grid(), )
-        pass
+    # def to_park(self):
+    #     state = self.get_state()
+    #     cost = manhattan_dist(state.get_grid())
+    #     to_park = Node(state.get_grid(), )
+    #     pass

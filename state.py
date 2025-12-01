@@ -1,8 +1,8 @@
-from action import Action, ActionTypes
+from action import Action, ActionTypes, copy_grid
 from manifest import ManifestItem, ItemPosition
 from cell import CellTypes
 from coordinate import Coordinate
-from utils import get_sides, get_weight_list, compare_weight_lists, calculate_weight, compare_str_lists, copy_grid
+from utils import get_sides, get_weight_list, compare_weight_lists, calculate_weight, compare_str_lists
 
 class State:
     def __init__(self, grid: list[list[ManifestItem]], crane:Coordinate=Coordinate(9,1)):
@@ -22,6 +22,9 @@ class State:
     
     def copy(self):
         return State(copy_grid(self.grid))
+    
+    def copy_with_new_crane(self, crane:Coordinate):
+        return State(copy_grid(self.grid), crane.copy())
     
     def get_crane(self) -> Coordinate:
         return self.crane
@@ -155,29 +158,42 @@ class State:
         return normal or mirrored
     
     # calculates all the possible operations from the current state, based on actionType
-    # TODO: update with action type
     def generate_actions(self, actionType:ActionTypes) -> list[Action]:
-
-        # match(actionType):
-        #     case ActionTypes.FromPark:
-
-        moveable_items = self.get_moveable_items()
-        open_spots = self.get_open_spots()
-
         actions = []
 
-        for source in moveable_items:
-            for target in open_spots:
-                if source.directly_below(target): # cannot float
-                    continue
-                actions.append(Action(source, target))
+        match(actionType):
+            case ActionTypes.FromPark:
+                park = Coordinate(9,1)
+                park_item = ManifestItem(park,0,"PARK")
+                moveable_items = self.get_moveable_items()
+                for target in moveable_items:
+                    actions.append(Action(park_item, target))
+            case ActionTypes.ToItem:
+                crane_item = ManifestItem(self.crane, 0, "CRANE")
+                moveable_items = self.get_moveable_items()
+                for target in moveable_items:
+                    if crane_item == target:
+                        continue
+                    actions.append(Action(crane_item, target))
+            case ActionTypes.MoveItem:
+                crane_item = ManifestItem(self.crane, 0, "CRANE")
+                open_spots = self.get_open_spots()
+                for target in open_spots:
+                    if crane_item.directly_below(target):
+                        continue
+                    actions.append(Action(crane_item, target))
+            case ActionTypes.ToPark:
+                park = Coordinate(9,1)
+                park_item = ManifestItem(park, 0, "PARK")
+                crane_item = ManifestItem(self.crane, 0, "CRANE")
+                actions.append(Action(crane_item, park_item))
         
         return actions
 
     # swaps coordinates of source and target, returns a new state
-    def move(self, action:Action):
+    def move(self, action:Action, actionType:ActionTypes):
         new_crane = action.target.get_coordinate().copy()
-        return State(action.execute_move(self.get_grid()), new_crane)
+        return State(action.execute_move(self.get_grid(), actionType), new_crane)
     
     # criteria b: |Ph - Sh| < (Sum(Po, So) * 0.10), so expected is |Ph-Sh| > (Sum(Po, So) * 0.1) therefore |Ph - Sh| - (sum(Po, So) * 10) > 0
     # therefore, an admissible heurstic would be |Ph - Sh| - (sum(Po, So) * 10)
@@ -206,4 +222,3 @@ class State:
     def meets_criteria_b(self) -> bool:
         criteria_b_calc = self.criteria_b()
         return (criteria_b_calc < 0)
-

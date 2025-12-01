@@ -14,25 +14,36 @@ class CraneMoves(Enum):
         if (curr_row == target_row) and (curr_col == target_col):
             return CraneMoves.AtDest
         
-        if (curr_row > target_row) and (curr_col == target_col):
+        if (curr_row > target_row) and (curr_col == target_col): # crane is above
             return CraneMoves.MoveDown
         
+        if (curr_row == 8): # in park, but park is not destination
+            return CraneMoves.MoveDown
+        
+        if (target_row == 8) and (curr_col == target_col): # crane is below park
+            return CraneMoves.MoveUp
+        
+        if (curr_row == target_row):
+            if (curr_col == target_col - 1): # crane is directly to left of item
+                return CraneMoves.MoveRight
+            elif (curr_col == target_col + 1): # crane is directly to right of item
+                return CraneMoves.MoveLeft
+    
         # curr cannot be below target and in same column, so out of bounds is prevented
         
-        item_left = CellTypes.to_type(grid[curr_row][curr_col-1])
-        item_right = CellTypes.to_type(grid[curr_row][curr_col-1])
+        item_left = CellTypes.to_type(grid[curr_row][curr_col-1].get_title())
+        item_right = CellTypes.to_type(grid[curr_row][curr_col+1].get_title())
         
-        if (curr_row == target_row) and (curr_col < target_col) and item_right == CellTypes.UNUSED:
-            return CraneMoves.MoveRight
+        if (curr_col < target_col): # crane is to left of item
+            if item_right != CellTypes.UNUSED:
+                return CraneMoves.MoveUp # wall in the way, climb up
+            else:
+                return CraneMoves.MoveRight # nothing in the way continue moving right
         
-        if (curr_row == target_row) and (curr_col > target_col) and item_left == CellTypes.UNUSED:
-            return CraneMoves.MoveLeft
-        
-        if item_right != CellTypes.UNUSED or item_left != CellTypes.UNUSED:
-            return CraneMoves.MoveUp
-    
-        if curr_col < target_col:
-            return CraneMoves.MoveRight
-        elif curr_col > target_col:
-            return CraneMoves.MoveLeft
+        if (curr_col > target_col): # crane is to right of item
+            if item_left != CellTypes.UNUSED:
+                return CraneMoves.MoveUp # wall in the way, climb up
+            else:
+                return CraneMoves.MoveLeft # nothing in the way continue moving left
+
     
