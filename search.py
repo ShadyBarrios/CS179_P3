@@ -28,6 +28,10 @@ class Search():
         frontier.put(start)
         frontier_list.append(start)
 
+        if start.meets_criteria_b():
+            print("wow")
+            return Solution(None)
+
         while not frontier.empty():
             node:Node = frontier.get()
             

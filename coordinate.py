@@ -16,7 +16,7 @@ class Coordinate:
     def __str__(self):
         display_row = self.loc[0] # "8 -" for display
         display_col = self.loc[1] # "12 -" for display
-        return f"({display_col}, {display_row})"
+        return f"[{display_row:02d},{display_col:02d}]"
     
     def copy(self):
         return Coordinate(self.loc[0], self.loc[1])

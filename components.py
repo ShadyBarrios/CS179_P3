@@ -7,6 +7,7 @@ from state import State
 from solution import Solution
 from search import Search
 from PySide6 import QtCore
+from coordinate import Coordinate
 import time
 
 class States(Enum):
@@ -44,7 +45,7 @@ class SearchThread(QtCore.QObject):
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run_search)
         self.worker.solution.connect(self.thread.quit)
-        self.worker.solution.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
     
     def run(self):
@@ -60,6 +61,9 @@ class Components():
         self.grid_display = None
         self.src_file_name = None
         self.set_page(Pages.FilePickPage)
+        self.solution:Solution = None
+        self.solutionIdx = 0
+        self.currentMove:str = None
         
     def start_app(self):
         result = self.pick_file()
@@ -69,7 +73,6 @@ class Components():
             self.searchThread = SearchThread(result)
             self.searchThread.worker.solution.connect(self.solution_found)
             self.searchThread.run()
-
 
     def pick_file(self):
         file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a manifest txt file", None, "Text Files (*.txt)")
@@ -112,6 +115,54 @@ class Components():
     @QtCore.Slot(Solution)
     def solution_found(self, solution):
         print(f"Hi outside of thread... solution:\n{solution}")
+        self.solution = solution   
+        self.solutionIdx = 0 
+        self.display_solution()
+        self.ui.ContinueButton.clicked.connect(self.display_solution)
+
+    def display_solution(self):
+        idx = self.solutionIdx
+        nodes = self.solution.get_nodes()
+        actions = self.solution.get_actions()
+        node = nodes[idx]
+        action = actions[idx]
+        park = Coordinate(9,1)
+        message = f"{idx} of {len(actions)}: Move "
+
+        print(f"Here {len(actions)}")
+        if len(actions) == 0: # no moves needed
+            self.display_no_moves_needed()
+        
+        if self.solutionIdx == len(actions): # end reached
+            self.end_reached()
+        
+        if action.source == park:
+            actionType = ActionTypes.FromPark 
+        elif action.target == park:
+            actionType = ActionTypes.ToPark
+        else:
+            actionType = ActionTypes.MoveItem
+
+        if self.currentMove is not None:
+            self.add_to_moves(self.currentMove)
+
+        match(actionType):
+            case ActionTypes.FromPark:
+                message += f"crane from {source_styling('park')} to {target_styling(action.target.get_coordinate())}"
+            case ActionTypes.ToPark:
+                message += f"from {source_styling(action.source.get_coordinate())} to {target_styling('park')}"
+            case ActionTypes.MoveItem:
+                message += f"from {source_styling(action.source.get_coordinate())} to {target_styling(action.target.get_coordinate())}"
+        
+        self.currentMove = message
+        self.solutionIdx += 1
+        self.grid_display.update(node, action)
+
+    def display_no_moves_needed(self):
+        pass
+
+    def end_reached(self):
+        self.restart()
 
     def hide_all(self, parentLayout: QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
@@ -165,3 +216,8 @@ class Components():
 
     def get_src_file_name(self) -> str:
         return self.src_file_name
+    
+    def add_to_moves(self, move:str) -> str:
+        move_history = self.ui.MoveHistoryLabel.text()
+        move_history += move + "\n"
+        self.ui.MoveHistoryLabel.setText(move_history)

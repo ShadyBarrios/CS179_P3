@@ -127,3 +127,9 @@ def manhattan_dist(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, ta
     
     dist -= int(dist != 0) # crane hover, so if it moves to target, then just -1
     return dist
+
+def source_styling(txt:str) -> str:
+    return f"<span style='color: green;'>{txt}</span>"
+
+def target_styling(txt:str) -> str:
+    return f"<span style='color: red;'>{txt}</span>"

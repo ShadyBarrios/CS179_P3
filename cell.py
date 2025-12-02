@@ -33,7 +33,7 @@ StyleBackgroundDict = {
 }
 
 class Cell:
-    base_stylesheet = "padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black;"
+    base_stylesheet = "padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; "
 
     def __init__(self, item:ManifestItem):
         self.item = item
@@ -44,12 +44,16 @@ class Cell:
         self._set_label_text()
         self.style = self.base_stylesheet + StyleBackgroundDict[self.type]
         self.label.setStyleSheet(self.style)
+        self.label.style().polish(self.label)
 
     def _set_label_text(self):
         if self.item.title == "UNUSED" or self.item.title == "NAN":
             self.label.setText("UNUSED")
         else:
             self.label.setText(str(self.item.weight))
+        
+        # if self.item.title == "UNUSED" or self.item.title == "NAN":
+        #     self.label.setText("UNUSED")
         # elif len(self.item.title) > 6:
         #     self.label.setText(self.item.title[:5]+"...")
         # else:
@@ -86,8 +90,14 @@ class Cell:
             self.label.setText(value)
 
     def set_style(self, style:str):
+        print(style)
         self.label.setStyleSheet(style)
+        # self.label.style().unpolish(self.label)
+        # self.label.style().polish(self.label)
+        # self.label.update()
+        self.label.repaint()
         self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        print("style updated")
 
     def generate_style(self) -> str:
         targetType = self.get_targetType()
@@ -98,17 +108,28 @@ class Cell:
         if self.type == CellTypes.UNUSED:
             background = self.item.get_position()
         
-        return self.base_stylesheet + StyleBackgroundDict[background]
+        style = self.base_stylesheet + StyleBackgroundDict[background]
+        # print(style)
+        return style
     
 class ParkCell(Cell):
     def __init__(self, parkLabel:QtWidgets.QLabel):
         self.parkLabel = parkLabel
         self.parkLabel.setText("CRANE")
-        self.coordinate = Coordinate
+        self.coordinate = Coordinate(9,1)
         self.targetType = None
         self.update(None)
     
     def update(self, status:TargetTypes):
+        stylesheet = self.base_stylesheet
+        if status == None or not(isinstance(status, TargetTypes)):
+            stylesheet += StyleBackgroundDict[ItemPosition.STARBOARD]
+        else:
+            stylesheet += StyleBackgroundDict[status]
+        self.parkLabel.setStyleSheet(stylesheet)
+
+    def refresh(self):
+        status = self.targetType
         stylesheet = self.base_stylesheet
         if status == None or not(isinstance(status, TargetTypes)):
             stylesheet += StyleBackgroundDict[ItemPosition.STARBOARD]
