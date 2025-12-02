@@ -12,7 +12,7 @@ port_side = [203, 101]
 starboard_side = [200, 99]
 
 ## NOTE:
-## heuristic can be manhattan distance from 
-# crane to closest free position if next type is moveitem
-# crane to closest moveable object then to closest free position if next type is toItem
-# crane to park if next type is ToPark
+# heuristic can be the time of the "best" next "move item" action
+# the best next move action is the action with the biggest impact on weight diff
+# if current node came from to item, 
+# if current node came from move item, 

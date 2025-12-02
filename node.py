@@ -22,9 +22,16 @@ class Node:
             return False
 
         comp_states = self.state == rhs.state
+
+        comp_actions_crane_matters = (self.actionType == ActionTypes.MoveItem) and (rhs.actionType == ActionTypes.MoveItem) # both got done moving items
+        comp_crane = self.crane == rhs.crane
+        
+        comp_actions_crane_doesnt_matter = (self.actionType != ActionTypes.MoveItem) and (rhs.actionType != ActionTypes.MoveItem)
+
         comp_actions = self.actionType == rhs.actionType
 
-        return (comp_states and comp_actions)
+        # return (comp_states and (comp_actions_crane_doesnt_matter or (comp_actions_crane_matters and comp_crane)))
+        return (comp_states and comp_actions and comp_crane)
     
     def __lt__(self, rhs):
         if not(isinstance(rhs, Node)):

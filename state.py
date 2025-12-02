@@ -128,15 +128,8 @@ class State:
 
         port = compare_weight_lists(lhs_port_weights, rhs_port_weights)
         starboard = compare_weight_lists(lhs_starboard_weights, rhs_starboard_weights)
-        normal = port and starboard
 
-        # the grid can also be considered equal if they mirror each other
-        port_mirrored = compare_weight_lists(lhs_port_weights, rhs_starboard_weights)
-        # split for readability (too long of a line)
-        starboard_mirrored = compare_weight_lists(lhs_starboard_weights, rhs_port_weights)
-        mirrored = port_mirrored and starboard_mirrored
-
-        return normal or mirrored
+        return (port and starboard)
 
     # compares to see that both grids have the same moveable objects on the same sides (or mirrored)
     def compare_moveable_objects(lhs_port, lhs_starboard, rhs_port, rhs_starboard) -> bool:
@@ -196,9 +189,35 @@ class State:
     # criteria b: |Ph - Sh| < =(Sum(Po, So) * 0.10), so expected is |Ph-Sh| >= (Sum(Po, So) * 0.1) therefore |Ph - Sh| - (sum(Po, So) * 10) >= 0
     # therefore, an admissible heurstic would be |Ph - Sh| - (sum(Po, So) * 10)
     # however, this could be negative (when goal met) and h(n) must be >= 0, so h(n) = max(0, |Ph - Sh| - (sum(Po, So) * 10))
-    def calculate_heuristic(self) -> float:
-        criteria_b_calc = self.criteria_b()
-        return max(0, criteria_b_calc)
+    # def calculate_heuristic(self) -> float:
+    #     criteria_b_calc = self.criteria_b()
+    #     return max(0, criteria_b_calc)
+
+    def calculate_heuristic(self) -> int:
+        grid = self.get_grid()
+        port_side, starboard_side = get_sides(grid)
+        port_side_weight = calculate_weight(port_side)
+        starboard_side_weight = calculate_weight(starboard_side)
+        total_weight = port_side_weight + starboard_side_weight
+        criteria = total_weight * 0.10
+
+        crate_distances = []
+        if port_side_weight > starboard_side_weight:
+            for row in port_side:
+                for item in row:
+                    if item.get_weight() >= criteria:
+                        crate_distances.append((7-item.get_col()))
+            crate_distances.sort()
+            return crate_distances[0]
+        else:
+            for row in starboard_side:
+                for item in row:
+                    if item.get_weight() >= criteria:
+                        crate_distances.append(abs(6-item.get_col()))
+            crate_distances.sort()
+            return crate_distances[0]
+            
+
     
     def get_side_weights(self) -> tuple[int, int]:
         port_side, starboard_side = get_sides(self.get_grid())

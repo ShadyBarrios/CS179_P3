@@ -125,4 +125,5 @@ def manhattan_dist(grid:list[list[ManifestItem]], curr_row:int, curr_col:int, ta
         dist += 1
         crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col)
     
+    dist -= int(dist != 0) # crane hover, so if it moves to target, then just -1
     return dist

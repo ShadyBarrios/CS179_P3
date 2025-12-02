@@ -16,6 +16,7 @@ class Search():
 
         node_bsf:Node = None
         node_bsf_weight_diff:int = intmax # will be used to track
+        node_bsf_cost:int = intmax
 
         # for fast lookup
         frontier_list = []
@@ -32,19 +33,21 @@ class Search():
             
             print(f"Chose {node.get_action()} | {node.actionType} | {node.get_weight_diff()} | {node.get_total_cost()}")
             node_weight_diff = node.get_weight_diff()
+            node_cost = node.get_cost()
             
-            if node.is_goal_state():
-                return Solution(node)
+            if node.meets_criteria_b():
+                return Solution(node.to_park())
             
-            # # since our heuristic is admissible and uses weight diff ((total weight * 10) - weight diff)
-            # #   if weight diff is increasing then that means that we have found a minimum
-            if node_weight_diff > node_bsf_weight_diff:
-                print("woof")
-                return Solution(node_bsf.to_park())
+            # # # since our heuristic is admissible and uses weight diff ((total weight * 10) - weight diff)
+            # # #   if weight diff is increasing then that means that we have found a minimum
+            # if node_weight_diff > node_bsf_weight_diff:
+            #     print("woof")
+            #     return Solution(node_bsf.to_park())
 
             # since time matters we only consider it bsf if its explicity <, not <=
-            if node_weight_diff < node_bsf_weight_diff:
+            if node_weight_diff < node_bsf_weight_diff or (node_weight_diff == node_bsf_weight_diff and node_cost < node_bsf_cost):
                 node_bsf_weight_diff = node_weight_diff
+                node_bsf_cost = node_cost
                 node_bsf = node
 
             frontier_list.remove(node)

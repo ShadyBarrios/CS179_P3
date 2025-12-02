@@ -29,19 +29,16 @@ class CraneMoves(Enum):
                 return CraneMoves.MoveRight
             elif (curr_col == target_col + 1): # crane is directly to right of item
                 return CraneMoves.MoveLeft
-    
-        # curr cannot be below target and in same column, so out of bounds is prevented
-        
-        item_left = CellTypes.to_type(grid[curr_row][curr_col-1].get_title())
-        item_right = CellTypes.to_type(grid[curr_row][curr_col+1].get_title())
         
         if (curr_col < target_col): # crane is to left of item
+            item_right = CellTypes.to_type(grid[curr_row][curr_col+1].get_title())
             if item_right != CellTypes.UNUSED:
                 return CraneMoves.MoveUp # wall in the way, climb up
             else:
                 return CraneMoves.MoveRight # nothing in the way continue moving right
         
         if (curr_col > target_col): # crane is to right of item
+            item_left = CellTypes.to_type(grid[curr_row][curr_col-1].get_title())
             if item_left != CellTypes.UNUSED:
                 return CraneMoves.MoveUp # wall in the way, climb up
             else:
