@@ -4,10 +4,12 @@ import sys
 from PySide6 import QtWidgets
 from main_window import *
 from components import Components
+from cell import global_stylesheet
 
 def main():
     app = QApplication(sys.argv)
     widget = MainWindow()
+    widget.setStyleSheet(global_stylesheet)
     components = Components(widget.ui)
     components.ui.FilePickButton.clicked.connect(components.start_app)
     components.ui.RestartButton.clicked.connect(components.restart)

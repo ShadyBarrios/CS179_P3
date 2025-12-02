@@ -3,6 +3,23 @@ from PySide6 import QtWidgets, QtCore
 from manifest import ManifestItem, ItemPosition
 from coordinate import Coordinate
 
+# CellTypes.NAN: "background-color:BLACK; color:BLACK;",
+# CellTypes.UNUSED: "background-color:WHITE; color:WHITE;",
+# CellTypes.USED: "background-color:rgba(255, 165, 0, 0.5); color:BLACK;",
+# TargetTypes.TARGET: "background-color:rgba(255, 0, 0, 0.5); color:BLACK;",
+# TargetTypes.SOURCE: "background-color:rgba(60, 179, 133, 0.5); color:BLACK;",
+# ItemPosition.PORT: "background-color:WHITE; color:WHITE;",
+# ItemPosition.STARBOARD: "background-color:GRAY; color:GRAY;"
+
+global_stylesheet = """
+QLabel[cls="NAN"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:BLACK; color:BLACK; }
+QLabel[cls="USED"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(255, 165, 0, 0.5); color:BLACK; }
+QLabel[cls="TARGET"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(255, 0, 0, 0.5); color:BLACK; }
+QLabel[cls="SOURCE"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(60, 179, 133, 0.5); color:BLACK; }
+QLabel[cls="PORT"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black;background-color:WHITE; color:WHITE; }
+QLabel[cls="STARBOARD"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:GRAY; color:GRAY; }
+"""
+
 class TargetTypes(Enum):
     TARGET = 1
     SOURCE = 2
@@ -21,30 +38,17 @@ class CellTypes(Enum):
             return CellTypes.UNUSED
         else:
             return CellTypes.USED
-        
-StyleBackgroundDict = {
-    CellTypes.NAN: "background-color:BLACK; color:BLACK;",
-    CellTypes.UNUSED: "background-color:WHITE; color:WHITE;",
-    CellTypes.USED: "background-color:rgba(255, 165, 0, 0.5); color:BLACK;",
-    TargetTypes.TARGET: "background-color:rgba(255, 0, 0, 0.5); color:BLACK;",
-    TargetTypes.SOURCE: "background-color:rgba(60, 179, 133, 0.5); color:BLACK;",
-    ItemPosition.PORT: "background-color:WHITE; color:WHITE;",
-    ItemPosition.STARBOARD: "background-color:GRAY; color:GRAY;"
-}
 
 class Cell:
-    base_stylesheet = "padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; "
-
     def __init__(self, item:ManifestItem):
         self.item = item
         self.type = CellTypes.to_type(item.get_title())
         self.label = QtWidgets.QLabel()
+        self.label.setAttribute(QtCore.Qt.WA_StyledBackground, True)
         self.targetType = None
 
         self._set_label_text()
-        self.style = self.base_stylesheet + StyleBackgroundDict[self.type]
-        self.label.setStyleSheet(self.style)
-        self.label.style().polish(self.label)
+        self.update_style()
 
     def _set_label_text(self):
         if self.item.title == "UNUSED" or self.item.title == "NAN":
@@ -89,50 +93,67 @@ class Cell:
         else:
             self.label.setText(value)
 
-    def set_style(self, style:str):
-        print(style)
-        self.label.setStyleSheet(style)
-        # self.label.style().unpolish(self.label)
-        # self.label.style().polish(self.label)
-        # self.label.update()
-        self.label.repaint()
-        self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        print("style updated")
-
-    def generate_style(self) -> str:
+    def update_style(self):
         targetType = self.get_targetType()
-
         # target type takes precedence
         background = self.get_type() if targetType is None else targetType
-
-        if self.type == CellTypes.UNUSED:
+        if background == CellTypes.UNUSED:
             background = self.item.get_position()
         
-        style = self.base_stylesheet + StyleBackgroundDict[background]
-        # print(style)
-        return style
+        match(background):
+            case TargetTypes.TARGET:
+                self.label.setProperty("cls", "TARGET")
+            case TargetTypes.SOURCE:
+                self.label.setProperty("cls", "SOURCE")
+            case CellTypes.USED:
+                self.label.setProperty("cls", "USED")
+            case CellTypes.NAN:
+                self.label.setProperty("cls", "NAN")
+            case ItemPosition.PORT:
+                self.label.setProperty("cls", "PORT")
+            case ItemPosition.STARBOARD:
+                self.label.setProperty("cls", "STARBOARD")
+        
+        self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.label.style().unpolish(self.label)
+        self.label.style().polish(self.label)
+        self.label.update()
+
+    # def generate_style(self) -> str:
+    #     targetType = self.get_targetType()
+
+    #     # target type takes precedence
+    #     background = self.get_type() if targetType is None else targetType
+
+    #     if self.type == CellTypes.UNUSED:
+    #         background = self.item.get_position()
+        
+    #     style = self.base_stylesheet + StyleBackgroundDict[background]
+    #     # print(style)
+    #     return style
     
 class ParkCell(Cell):
     def __init__(self, parkLabel:QtWidgets.QLabel):
         self.parkLabel = parkLabel
-        self.parkLabel.setText("CRANE")
+        self.parkLabel.setAttribute(QtCore.Qt.WA_StyledBackground, True)
+        self.parkLabel.setText("  PARK  ")
         self.coordinate = Coordinate(9,1)
         self.targetType = None
-        self.update(None)
+        self.update_park(None)
     
-    def update(self, status:TargetTypes):
-        stylesheet = self.base_stylesheet
+    def update_park(self, status:TargetTypes):
         if status == None or not(isinstance(status, TargetTypes)):
-            stylesheet += StyleBackgroundDict[ItemPosition.STARBOARD]
+            print("star")
+            self.parkLabel.setProperty("cls", "STARBOARD")
         else:
-            stylesheet += StyleBackgroundDict[status]
-        self.parkLabel.setStyleSheet(stylesheet)
+            if status == TargetTypes.SOURCE:
+                self.parkLabel.setProperty("cls", "SOURCE")
+            else:
+                self.parkLabel.setProperty("cls", "TARGET")
 
-    def refresh(self):
-        status = self.targetType
-        stylesheet = self.base_stylesheet
-        if status == None or not(isinstance(status, TargetTypes)):
-            stylesheet += StyleBackgroundDict[ItemPosition.STARBOARD]
-        else:
-            stylesheet += StyleBackgroundDict[status]
-        self.parkLabel.setStyleSheet(stylesheet)
+        print(self.parkLabel.text())
+        
+        self.parkLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.parkLabel.style().unpolish(self.parkLabel)
+        self.parkLabel.style().polish(self.parkLabel)
+        self.parkLabel.update()

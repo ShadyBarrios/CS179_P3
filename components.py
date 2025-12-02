@@ -9,6 +9,7 @@ from search import Search
 from PySide6 import QtCore
 from coordinate import Coordinate
 import time
+import threading 
 
 class States(Enum):
     init_grid = 1
@@ -21,7 +22,7 @@ class Pages(Enum):
     ErrorPage = 2
 
 class SearchWorker(QtCore.QObject):
-    solution = QtCore.Signal(Solution)
+    solution = QtCore.Signal(object)
 
     def __init__(self, initial_state:State):
         super().__init__()
@@ -29,10 +30,11 @@ class SearchWorker(QtCore.QObject):
     
     @QtCore.Slot()
     def run_search(self):
+        print(f"Worker {QtCore.QThread.currentThread()} 2")
         self.search = Search(self.initial_state)
         time.sleep(0.5)
         solution = self.search.a_star_search()
-        print(f"Hi within thread: {solution.num_actions()} moves in solution")
+        print(f"Worker {QtCore.QThread.currentThread()} done")
         self.solution.emit(solution)
 
 class SearchThread(QtCore.QObject):
@@ -42,21 +44,25 @@ class SearchThread(QtCore.QObject):
         self.thread = QtCore.QThread()
         grid = create_grid_from_list(parse)
         self.worker = SearchWorker(State(grid))
-        self.worker.moveToThread(self.thread)
+
         self.thread.started.connect(self.worker.run_search)
+
         self.worker.solution.connect(self.thread.quit)
         self.thread.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
+        self.worker.moveToThread(self.thread)
     
     def run(self):
+        print(f"Worker {QtCore.QThread.currentThread()}")
         self.thread.start()
 
-class Components():
+class Components(QtCore.QObject):
     searchThread = None
     col_count: int = 12
     row_count: int = 8
 
     def __init__(self, ui: Ui_MainWindow):
+        super().__init__()
         self.ui = ui
         self.grid_display = None
         self.src_file_name = None
@@ -71,8 +77,10 @@ class Components():
             return
         else:
             self.searchThread = SearchThread(result)
-            self.searchThread.worker.solution.connect(self.solution_found)
+            print(QtCore.QThread.currentThread())
+            self.searchThread.worker.solution.connect(self.solution_found, type=QtCore.Qt.QueuedConnection)
             self.searchThread.run()
+            print(QtCore.QThread.currentThread())
 
     def pick_file(self):
         file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a manifest txt file", None, "Text Files (*.txt)")
@@ -112,29 +120,34 @@ class Components():
         self.display_parse_results(num_used_cells, self.get_src_file_name())
         self.show_all(self.ui.ShipGridLayout)
 
-    @QtCore.Slot(Solution)
+    @QtCore.Slot(object)
     def solution_found(self, solution):
-        print(f"Hi outside of thread... solution:\n{solution}")
-        self.solution = solution   
+        print(f"Hi outside of thread... solution:\n{solution} | thread {QtCore.QThread.currentThread()}")
+        self.solutionStates = solution.get_states()
+        self.solutionActions = solution.get_actions()
         self.solutionIdx = 0 
         self.display_solution()
+        self.show_all(self.ui.MessageLayouts)
         self.ui.ContinueButton.clicked.connect(self.display_solution)
 
     def display_solution(self):
         idx = self.solutionIdx
-        nodes = self.solution.get_nodes()
-        actions = self.solution.get_actions()
-        node = nodes[idx]
-        action = actions[idx]
+        states = self.solutionStates
+        actions = self.solutionActions
         park = Coordinate(9,1)
-        message = f"{idx} of {len(actions)}: Move "
+        message = f"{idx+1} of {len(actions)}: Move "
 
-        print(f"Here {len(actions)}")
+        print(f"Here {len(actions)} | {self.solutionIdx}")
         if len(actions) == 0: # no moves needed
             self.display_no_moves_needed()
-        
+            return
+
         if self.solutionIdx == len(actions): # end reached
             self.end_reached()
+            return
+
+        state = states[idx]
+        action = actions[idx]
         
         if action.source == park:
             actionType = ActionTypes.FromPark 
@@ -156,7 +169,8 @@ class Components():
         
         self.currentMove = message
         self.solutionIdx += 1
-        self.grid_display.update(node, action)
+        # self.ui.MessageLhsLabel.setText(message)
+        self.grid_display.update(state, action)
 
     def display_no_moves_needed(self):
         pass
@@ -218,6 +232,6 @@ class Components():
         return self.src_file_name
     
     def add_to_moves(self, move:str) -> str:
-        move_history = self.ui.MoveHistoryLabel.text()
-        move_history += move + "\n"
-        self.ui.MoveHistoryLabel.setText(move_history)
+        move_history = self.ui.PreviousMovesLabel.text()
+        move_history += move + "<br>"
+        self.ui.PreviousMovesLabel.setText(move_history)

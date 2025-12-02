@@ -97,10 +97,6 @@ class Ui_MainWindow(object):
 
         self.ParkLayout.addWidget(self.ParkLabel)
 
-        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.ParkLayout.addItem(self.horizontalSpacer_10)
-
         self.ContinueLayout = QHBoxLayout()
         self.ContinueLayout.setObjectName(u"ContinueLayout")
         self.ContinueButton = QPushButton(self.horizontalLayoutWidget_3)
@@ -247,7 +243,7 @@ class Ui_MainWindow(object):
         self.ContinueButton.setText(QCoreApplication.translate("MainWindow", u"Continue", None))
         self.WhenDoneLabel.setText(QCoreApplication.translate("MainWindow", u"when done", None))
         self.MoveHistoryLabel.setText(QCoreApplication.translate("MainWindow", u"Move History:", None))
-        self.PreviousMovesLabel.setText(QCoreApplication.translate("MainWindow", u"Previous Moves", None))
+        self.PreviousMovesLabel.setText("")
         self.FilePickLabel.setText(QCoreApplication.translate("MainWindow", u"Enter a manifest (must be .txt):", None))
         self.FilePickButton.setText(QCoreApplication.translate("MainWindow", u"Choose a file", None))
         self.ErrorLabel.setText(QCoreApplication.translate("MainWindow", u"Error", None))

@@ -172,19 +172,6 @@
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_10">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
               <layout class="QHBoxLayout" name="ContinueLayout">
                <item>
                 <widget class="QPushButton" name="ContinueButton">
@@ -259,7 +246,7 @@
                 <item>
                  <widget class="QLabel" name="PreviousMovesLabel">
                   <property name="text">
-                   <string>Previous Moves</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
