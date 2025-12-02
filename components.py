@@ -30,7 +30,7 @@ class SearchWorker(QtCore.QObject):
     
     @QtCore.Slot()
     def run_search(self):
-        print(f"Worker {QtCore.QThread.currentThread()} 2")
+        print(f"Worker {QtCore.QThread.currentThread()}")
         self.search = Search(self.initial_state)
         time.sleep(0.5)
         solution = self.search.a_star_search()
@@ -53,7 +53,6 @@ class SearchThread(QtCore.QObject):
         self.worker.moveToThread(self.thread)
     
     def run(self):
-        print(f"Worker {QtCore.QThread.currentThread()}")
         self.thread.start()
 
 class Components(QtCore.QObject):
@@ -122,7 +121,7 @@ class Components(QtCore.QObject):
 
     @QtCore.Slot(object)
     def solution_found(self, solution):
-        print(f"Hi outside of thread... solution:\n{solution} | thread {QtCore.QThread.currentThread()}")
+        print(f"Hi outside of worker thread (now at thread {QtCore.QThread.currentThread()})... solution:\n{solution}")
         self.solutionStates = solution.get_states()
         self.solutionActions = solution.get_actions()
         self.solutionIdx = 0 
@@ -140,43 +139,52 @@ class Components(QtCore.QObject):
         print(f"Here {len(actions)} | {self.solutionIdx}")
         if len(actions) == 0: # no moves needed
             self.display_no_moves_needed()
-            return
-
-        if self.solutionIdx == len(actions): # end reached
+        elif self.solutionIdx == len(actions): # end reached
             self.end_reached()
-            return
-
-        state = states[idx]
-        action = actions[idx]
-        
-        if action.source == park:
-            actionType = ActionTypes.FromPark 
-        elif action.target == park:
-            actionType = ActionTypes.ToPark
         else:
-            actionType = ActionTypes.MoveItem
+            state = states[idx]
+            action = actions[idx]
+            
+            if action.source == park:
+                actionType = ActionTypes.FromPark 
+            elif action.target == park:
+                actionType = ActionTypes.ToPark
+            else:
+                actionType = ActionTypes.MoveItem
 
-        if self.currentMove is not None:
-            self.add_to_moves(self.currentMove)
+            if self.currentMove is not None:
+                self.add_to_moves(self.currentMove)
 
-        match(actionType):
-            case ActionTypes.FromPark:
-                message += f"crane from {source_styling('park')} to {target_styling(action.target.get_coordinate())}"
-            case ActionTypes.ToPark:
-                message += f"from {source_styling(action.source.get_coordinate())} to {target_styling('park')}"
-            case ActionTypes.MoveItem:
-                message += f"from {source_styling(action.source.get_coordinate())} to {target_styling(action.target.get_coordinate())}"
-        
-        self.currentMove = message
-        self.solutionIdx += 1
-        # self.ui.MessageLhsLabel.setText(message)
-        self.grid_display.update(state, action)
+            match(actionType):
+                case ActionTypes.FromPark:
+                    message += f"crane from {source_styling('park')} to {target_styling(action.target.get_coordinate())}"
+                case ActionTypes.ToPark:
+                    message += f"from {source_styling(action.source.get_coordinate())} to {target_styling('park')}"
+                case ActionTypes.MoveItem:
+                    message += f"from {source_styling(action.source.get_coordinate())} to {target_styling(action.target.get_coordinate())}"
+            
+            self.currentMove = message
+            self.solutionIdx += 1
+            self.ui.MessageLhsLabel.setText(message)
+            self.grid_display.update(state, action)
 
     def display_no_moves_needed(self):
-        pass
+        self.throw_error("No moves needed! Crate layout already meets criteria.")
 
     def end_reached(self):
+        self.solutionIdx = 0
+        self.solutionStates = None
+        self.solutionActions = None
+        self.currentMove = None
+        self.reset_grid_display()
+        print('resetting')
         self.restart()
+
+    def reset_grid_display(self):
+        cell_grid = self.grid_display.cell_grid
+        for row in cell_grid:
+            for cell in row:
+                self.ui.ShipGrid.removeWidget(cell.label)
 
     def hide_all(self, parentLayout: QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
