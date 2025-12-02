@@ -181,10 +181,21 @@ class Components(QtCore.QObject):
         self.restart()
 
     def reset_grid_display(self):
-        cell_grid = self.grid_display.cell_grid
-        for row in cell_grid:
-            for cell in row:
-                self.ui.ShipGrid.removeWidget(cell.label)
+        # cell_grid = self.grid_display.cell_grid
+        # for row in cell_grid:
+        #     for cell in row:
+        #         self.ui.ShipGrid.removeWidget(cell.label)
+        
+        # this doesn't work too
+        # self.ui.ShipGrid = QtWidgets.QGridLayout()
+        # print("new shipgrid")
+
+        # THIS WORKS!
+        while self.ui.ShipGrid.count():
+            item = self.ui.ShipGrid.takeAt(0)
+            item.widget().deleteLater()
+            del item
+        
 
     def hide_all(self, parentLayout: QtWidgets.QLayout):
         childItems:list[QtWidgets.QWidget] = get_all_children_items(parentLayout)
