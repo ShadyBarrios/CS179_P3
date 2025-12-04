@@ -146,9 +146,9 @@ class Components(QtCore.QObject):
             state = states[idx]
             action = actions[idx]
             
-            if action.source == park:
+            if action.source.coordinate == park:
                 actionType = ActionTypes.FromPark 
-            elif action.target == park:
+            elif action.target.coordinate == park:
                 actionType = ActionTypes.ToPark
             else:
                 actionType = ActionTypes.MoveItem
@@ -158,9 +158,9 @@ class Components(QtCore.QObject):
 
             match(actionType):
                 case ActionTypes.FromPark:
-                    message += f"crane from {source_styling('park')} to {target_styling(action.target.get_coordinate())}"
+                    message += f"crane from {source_styling('PARK')} to {target_styling(action.target.get_coordinate())}"
                 case ActionTypes.ToPark:
-                    message += f"from {source_styling(action.source.get_coordinate())} to {target_styling('park')}"
+                    message += f"from {source_styling(action.source.get_coordinate())} to {target_styling('PARK')}"
                 case ActionTypes.MoveItem:
                     message += f"from {source_styling(action.source.get_coordinate())} to {target_styling(action.target.get_coordinate())}"
             
