@@ -250,7 +250,7 @@ class Components(QtCore.QObject):
         self.set_page(Pages.ShipGridPage)
 
     def successful_restart(self):
-        message = f"I have written an updated manifest to the desktop as <br>{target_styling(self.outbound_file_name)}<br>Find it under the {target_styling(self.directory)} directory.<br>Don't forget to email it to the captian.<br>Click restart to use a new manifest or close the window.<br>"
+        message = f"I have written an updated manifest to the desktop as <br>{target_styling(self.outbound_file_name)}<br>Find it under the {target_styling(self.directory)} directory.<br>Don't forget to email it to the captain.<br>Click restart to use a new manifest or close the window.<br>"
         self.ui.SuccessMessageLabel.setText(message)
 
     def update_outbound_file(self, state:State):
