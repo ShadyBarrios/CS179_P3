@@ -18,8 +18,10 @@ class States(Enum):
 
 class Pages(Enum):
     ShipGridPage = 0
-    FilePickPage = 1
-    ErrorPage = 2
+    CommentPage = 1
+    FinishedPage = 2
+    FilePickPage = 3
+    ErrorPage = 4
 
 class SearchWorker(QtCore.QObject):
     solution = QtCore.Signal(object)

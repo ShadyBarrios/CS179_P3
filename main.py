@@ -12,7 +12,7 @@ def main():
     widget.setStyleSheet(global_stylesheet)
     components = Components(widget.ui)
     components.ui.FilePickButton.clicked.connect(components.start_app)
-    components.ui.RestartButton.clicked.connect(components.restart)
+    components.ui.ErrorRestartButton.clicked.connect(components.restart)
     widget.show()
     sys.exit(app.exec())
 

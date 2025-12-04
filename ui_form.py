@@ -16,8 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
-    QMainWindow, QPushButton, QScrollArea, QSizePolicy,
-    QSpacerItem, QStackedWidget, QVBoxLayout, QWidget)
+    QMainWindow, QPlainTextEdit, QPushButton, QScrollArea,
+    QSizePolicy, QSpacerItem, QStackedWidget, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -112,6 +113,15 @@ class Ui_MainWindow(object):
 
         self.ParkLayout.addLayout(self.ContinueLayout)
 
+        self.horizontalSpacer_20 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.ParkLayout.addItem(self.horizontalSpacer_20)
+
+        self.ToCommentButton = QPushButton(self.horizontalLayoutWidget_3)
+        self.ToCommentButton.setObjectName(u"ToCommentButton")
+
+        self.ParkLayout.addWidget(self.ToCommentButton)
+
         self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.ParkLayout.addItem(self.horizontalSpacer_8)
@@ -166,6 +176,106 @@ class Ui_MainWindow(object):
         self.MessageLayouts.addLayout(self.MessagesRhsLayout)
 
         self.AllPages.addWidget(self.ShipGridPage)
+        self.CommentPage = QWidget()
+        self.CommentPage.setObjectName(u"CommentPage")
+        self.verticalLayoutWidget_2 = QWidget(self.CommentPage)
+        self.verticalLayoutWidget_2.setObjectName(u"verticalLayoutWidget_2")
+        self.verticalLayoutWidget_2.setGeometry(QRect(9, 93, 911, 461))
+        self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget_2)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_10)
+
+        self.InsertCommentLabel = QLabel(self.verticalLayoutWidget_2)
+        self.InsertCommentLabel.setObjectName(u"InsertCommentLabel")
+
+        self.horizontalLayout_4.addWidget(self.InsertCommentLabel)
+
+        self.horizontalSpacer_11 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_11)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.CommentInput = QPlainTextEdit(self.verticalLayoutWidget_2)
+        self.CommentInput.setObjectName(u"CommentInput")
+
+        self.horizontalLayout_3.addWidget(self.CommentInput)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_12)
+
+        self.LogCommentButton = QPushButton(self.verticalLayoutWidget_2)
+        self.LogCommentButton.setObjectName(u"LogCommentButton")
+
+        self.horizontalLayout_5.addWidget(self.LogCommentButton)
+
+        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_13)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
+
+        self.AllPages.addWidget(self.CommentPage)
+        self.FinishedPage = QWidget()
+        self.FinishedPage.setObjectName(u"FinishedPage")
+        self.verticalLayoutWidget_3 = QWidget(self.FinishedPage)
+        self.verticalLayoutWidget_3.setObjectName(u"verticalLayoutWidget_3")
+        self.verticalLayoutWidget_3.setGeometry(QRect(10, 79, 911, 91))
+        self.verticalLayout_3 = QVBoxLayout(self.verticalLayoutWidget_3)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.horizontalSpacer_16 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_6.addItem(self.horizontalSpacer_16)
+
+        self.SuccessMessageLabel = QLabel(self.verticalLayoutWidget_3)
+        self.SuccessMessageLabel.setObjectName(u"SuccessMessageLabel")
+
+        self.horizontalLayout_6.addWidget(self.SuccessMessageLabel)
+
+        self.horizontalSpacer_17 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_6.addItem(self.horizontalSpacer_17)
+
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_6)
+
+        self.horizontalLayout_7 = QHBoxLayout()
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.horizontalSpacer_14 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_14)
+
+        self.SuccessRestartButton = QPushButton(self.verticalLayoutWidget_3)
+        self.SuccessRestartButton.setObjectName(u"SuccessRestartButton")
+
+        self.horizontalLayout_7.addWidget(self.SuccessRestartButton)
+
+        self.horizontalSpacer_15 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_15)
+
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_7)
+
+        self.AllPages.addWidget(self.FinishedPage)
         self.FilePickPage = QWidget()
         self.FilePickPage.setObjectName(u"FilePickPage")
         self.horizontalLayoutWidget = QWidget(self.FilePickPage)
@@ -195,42 +305,55 @@ class Ui_MainWindow(object):
         self.AllPages.addWidget(self.FilePickPage)
         self.ErrorPage = QWidget()
         self.ErrorPage.setObjectName(u"ErrorPage")
-        self.horizontalLayoutWidget_2 = QWidget(self.ErrorPage)
-        self.horizontalLayoutWidget_2.setObjectName(u"horizontalLayoutWidget_2")
-        self.horizontalLayoutWidget_2.setGeometry(QRect(10, 80, 911, 81))
-        self.ErrorLayout = QHBoxLayout(self.horizontalLayoutWidget_2)
+        self.verticalLayoutWidget_4 = QWidget(self.ErrorPage)
+        self.verticalLayoutWidget_4.setObjectName(u"verticalLayoutWidget_4")
+        self.verticalLayoutWidget_4.setGeometry(QRect(10, 79, 911, 81))
+        self.ErrorLayout = QVBoxLayout(self.verticalLayoutWidget_4)
         self.ErrorLayout.setObjectName(u"ErrorLayout")
         self.ErrorLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
         self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.ErrorLayout.addItem(self.horizontalSpacer_5)
+        self.horizontalLayout_8.addItem(self.horizontalSpacer_5)
 
-        self.verticalLayout = QVBoxLayout()
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.ErrorLabel = QLabel(self.horizontalLayoutWidget_2)
+        self.ErrorLabel = QLabel(self.verticalLayoutWidget_4)
         self.ErrorLabel.setObjectName(u"ErrorLabel")
         self.ErrorLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout.addWidget(self.ErrorLabel)
-
-        self.RestartButton = QPushButton(self.horizontalLayoutWidget_2)
-        self.RestartButton.setObjectName(u"RestartButton")
-
-        self.verticalLayout.addWidget(self.RestartButton)
-
-
-        self.ErrorLayout.addLayout(self.verticalLayout)
+        self.horizontalLayout_8.addWidget(self.ErrorLabel)
 
         self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.ErrorLayout.addItem(self.horizontalSpacer_6)
+        self.horizontalLayout_8.addItem(self.horizontalSpacer_6)
+
+
+        self.ErrorLayout.addLayout(self.horizontalLayout_8)
+
+        self.horizontalLayout_9 = QHBoxLayout()
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.horizontalSpacer_18 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_9.addItem(self.horizontalSpacer_18)
+
+        self.ErrorRestartButton = QPushButton(self.verticalLayoutWidget_4)
+        self.ErrorRestartButton.setObjectName(u"ErrorRestartButton")
+
+        self.horizontalLayout_9.addWidget(self.ErrorRestartButton)
+
+        self.horizontalSpacer_19 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_9.addItem(self.horizontalSpacer_19)
+
+
+        self.ErrorLayout.addLayout(self.horizontalLayout_9)
 
         self.AllPages.addWidget(self.ErrorPage)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
 
-        self.AllPages.setCurrentIndex(0)
+        self.AllPages.setCurrentIndex(4)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -242,11 +365,16 @@ class Ui_MainWindow(object):
         self.ParkLabel.setText(QCoreApplication.translate("MainWindow", u"Park", None))
         self.ContinueButton.setText(QCoreApplication.translate("MainWindow", u"Continue", None))
         self.WhenDoneLabel.setText(QCoreApplication.translate("MainWindow", u"when done", None))
+        self.ToCommentButton.setText(QCoreApplication.translate("MainWindow", u"Log Comment", None))
         self.MoveHistoryLabel.setText(QCoreApplication.translate("MainWindow", u"Move History:", None))
         self.PreviousMovesLabel.setText("")
+        self.InsertCommentLabel.setText(QCoreApplication.translate("MainWindow", u"Insert Comment Here", None))
+        self.LogCommentButton.setText(QCoreApplication.translate("MainWindow", u"Log Comment", None))
+        self.SuccessMessageLabel.setText(QCoreApplication.translate("MainWindow", u"Message", None))
+        self.SuccessRestartButton.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
         self.FilePickLabel.setText(QCoreApplication.translate("MainWindow", u"Enter a manifest (must be .txt):", None))
         self.FilePickButton.setText(QCoreApplication.translate("MainWindow", u"Choose a file", None))
         self.ErrorLabel.setText(QCoreApplication.translate("MainWindow", u"Error", None))
-        self.RestartButton.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
+        self.ErrorRestartButton.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
     # retranslateUi
 
