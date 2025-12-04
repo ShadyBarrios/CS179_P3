@@ -8,8 +8,9 @@ from solution import Solution
 from search import Search
 from PySide6 import QtCore
 from coordinate import Coordinate
-import time
-import threading 
+from action import Action, ActionTypes
+from time import localtime as current_time
+from os import makedirs as makedir
 
 class States(Enum):
     init_grid = 1
@@ -32,11 +33,9 @@ class SearchWorker(QtCore.QObject):
     
     @QtCore.Slot()
     def run_search(self):
-        print(f"Worker {QtCore.QThread.currentThread()}")
         self.search = Search(self.initial_state)
         time.sleep(0.5)
         solution = self.search.a_star_search()
-        print(f"Worker {QtCore.QThread.currentThread()} done")
         self.solution.emit(solution)
 
 class SearchThread(QtCore.QObject):
@@ -62,15 +61,23 @@ class Components(QtCore.QObject):
     col_count: int = 12
     row_count: int = 8
 
+    # TODO: Get "APP Started" time for log
     def __init__(self, ui: Ui_MainWindow):
         super().__init__()
         self.ui = ui
+        self.app_start_time = current_time()
         self.grid_display = None
-        self.src_file_name = None
+        self.src_file_name = ""
+        self.directory = "output/" + to_directory_name(self.app_start_time)
+        self.log_file_name = to_log_file_name(self.app_start_time)
+        self.file_root_name = ""
         self.set_page(Pages.FilePickPage)
         self.solution:Solution = None
         self.solutionIdx = 0
         self.currentMove:str = None
+        self.lastAction = None
+        self.lastMove = None
+        self.start_log()
         
     def start_app(self):
         result = self.pick_file()
@@ -78,10 +85,8 @@ class Components(QtCore.QObject):
             return
         else:
             self.searchThread = SearchThread(result)
-            print(QtCore.QThread.currentThread())
             self.searchThread.worker.solution.connect(self.solution_found, type=QtCore.Qt.QueuedConnection)
             self.searchThread.run()
-            print(QtCore.QThread.currentThread())
 
     def pick_file(self):
         file = QtWidgets.QFileDialog.getOpenFileName(None, "Pick a manifest txt file", None, "Text Files (*.txt)")
@@ -109,6 +114,8 @@ class Components(QtCore.QObject):
                     return None
         
         self.src_file_name = file_name
+        self.file_root_name = get_file_root_name(file_name)
+        self.outbound_file_name = self.file_root_name + "OUTBOUND" + ".txt"
         self.begin(grid_parse)
         return grid_parse
 
@@ -118,29 +125,78 @@ class Components(QtCore.QObject):
         self.hide_all(self.ui.ShipGridLayout)
         self.init_ShipGrid(grid_parse)
         num_used_cells = self.grid_display.get_num_used_cells()
-        self.display_parse_results(num_used_cells, self.get_src_file_name())
+        self.log_open_manifest(num_used_cells, current_time())
+        self.display_parse_results(num_used_cells)
         self.show_all(self.ui.ShipGridLayout)
 
     @QtCore.Slot(object)
     def solution_found(self, solution):
-        print(f"Hi outside of worker thread (now at thread {QtCore.QThread.currentThread()})... solution:\n{solution}")
         self.solutionStates = solution.get_states()
         self.solutionActions = solution.get_actions()
         self.solutionIdx = 0 
         self.display_solution()
         self.show_all(self.ui.MessageLayouts)
 
+    def start_log(self):
+        makedir(self.directory, exist_ok=True)
+
+        try:
+            with open(self.directory + "/" + self.log_file_name, "w") as log:
+                log.write(parse_time(self.app_start_time) + "Program was started.\n")
+        except FileNotFoundError:
+            self.throw_error("There was an error opening the log file.")
+    
+    def log_line(self, output:str):
+        try:
+            with open(self.directory + "/" + self.log_file_name, "a") as log:   
+                log.write(output)
+        except FileNotFoundError:
+            self.throw_error("There was an issue opening the log file.")
+
+    def log_open_manifest(self, numItems:int, currTime=current_time()):
+        output = parse_time(currTime) + f"Manifest {self.file_root_name}.txt is opened, there are {numItems} containers on the ship.\n"
+        self.log_line(output)
+
+    def log_solution_metrics(self, sol:Solution, currTime=current_time()):
+        output = parse_time(currTime) + f"Balance solution found, it will require {len(sol.get_actions())} moves/{sol.get_time_to_execute()} minutes.\n"
+        self.log_line(output)
+    
+    def log_move(self, action:Action, currTime=current_time()):
+        output = parse_time(currTime) + f"{action.source.coordinate} was moved to {action.target.coordinate}.\n"
+        self.log_line(output)
+ 
+    def log_comment(self, currTime=current_time()):
+        comment = self.ui.CommentInput.toPlainText()
+        if comment is None or comment == "":
+            self.set_page(Pages.ShipGridPage)
+        output = parse_time(currTime) + f"{comment}\n"
+        self.log_line(output)
+        self.set_page(Pages.ShipGridPage)
+
+    def log_completed_cycle(self, currTime=current_time()):
+        output = parse_time(currTime) + f"Finished a Cycle. Manifest {self.outbound_file_name} was written to desktop, and a reminder pop-up to operator to send file was displayed."
+        self.log_line(output)
+
+    def log_exit_app(self, currTime=current_time()):
+        output = parse_time(currTime) + f"Program was shut down."
+        self.log_line(output)
+
+    # TODO: allow scroll in history
     def display_solution(self):
         idx = self.solutionIdx
-        states = self.solutionStates
-        actions = self.solutionActions
+        states:list[State] = self.solutionStates
+        actions:list[Action] = self.solutionActions
         park = Coordinate(9,1)
         message = f"{idx+1} of {len(actions)}: Move "
 
-        print(f"Here {len(actions)} | {self.solutionIdx}")
         if len(actions) == 0: # no moves needed
             self.display_no_moves_needed()
-        elif self.solutionIdx >= len(actions): # end reached
+        
+        if self.lastAction is not None:
+            self.log_move(self.lastAction)
+            self.update_outbound_file(states[idx]) # will reach >= actions before >= states
+
+        if self.solutionIdx >= len(actions): # end reached
             self.end_reached()
         else:
             state = states[idx]
@@ -153,8 +209,8 @@ class Components(QtCore.QObject):
             else:
                 actionType = ActionTypes.MoveItem
 
-            if self.currentMove is not None:
-                self.add_to_moves(self.currentMove)
+            if self.lastMove is not None:
+                self.add_to_moves(self.lastMove)
 
             match(actionType):
                 case ActionTypes.FromPark:
@@ -164,7 +220,8 @@ class Components(QtCore.QObject):
                 case ActionTypes.MoveItem:
                     message += f"from {source_styling(action.source.get_coordinate())} to {target_styling(action.target.get_coordinate())}"
             
-            self.currentMove = message
+            self.lastMove = message
+            self.lastAction = action
             self.solutionIdx += 1
             self.ui.MessageLhsLabel.setText(message)
             self.grid_display.update(state, action)
@@ -172,7 +229,6 @@ class Components(QtCore.QObject):
     def display_no_moves_needed(self):
         self.throw_error("No moves needed! Crate layout already meets criteria.")
 
-    # TODO: allow scroll in history
     def end_reached(self):
         self.solutionIdx = 0
         self.solutionStates = None
@@ -180,26 +236,29 @@ class Components(QtCore.QObject):
         self.currentMove = None
         self.reset_grid_display()
         self.reset_previous_moves()
-        print('resetting')
-        self.restart()
+        self.to_success_page()
 
     def to_log_comment(self):
-        pass
+        self.set_page(Pages.CommentPage)
+        self.ui.CommentInput.setPlainText("")
 
     def to_success_page(self):
-        pass
+        self.successful_restart()
+        self.set_page(Pages.FinishedPage)
 
     def cancel_comment(self):
-        pass
-
-    def log_comment(self):
-        pass
-
-    def to_success_page(self):
-        pass
+        self.set_page(Pages.ShipGridPage)
 
     def successful_restart(self):
-        pass
+        message = f"I have written an updated manifest to the desktop as <br>{target_styling(self.outbound_file_name)}<br>Find it under the {target_styling(self.directory)} directory.<br>Don't forget to email it to the captian.<br>Click restart to use a new manifest or close the window.<br>"
+        self.ui.SuccessMessageLabel.setText(message)
+
+    def update_outbound_file(self, state:State):
+        try:
+            with open(self.directory + "/" + self.outbound_file_name, "w") as outbound:
+                outbound.write(f"{state}")
+        except FileNotFoundError:
+            self.throw_error("OUTBOUND file could not be opened.")
 
     def reset_previous_moves(self):
         self.ui.PreviousMovesLabel.setText("")
@@ -231,6 +290,7 @@ class Components(QtCore.QObject):
         self.ui.ErrorLabel.setText(errorMsg)
         self.ui.ErrorLabel.setStyleSheet("color:red")
     
+    # TODO: get program start time for log
     def restart(self):
         self.set_page(Pages.FilePickPage)
 
@@ -247,8 +307,8 @@ class Components(QtCore.QObject):
 
         self.grid_display = initial_state_grid_display
 
-    def display_parse_results(self, num_used_cells: int, src_file_name: str):
-        root_name = get_file_root_name(src_file_name)
+    def display_parse_results(self, num_used_cells: int):
+        root_name = self.file_root_name
         message = f"{root_name} has {num_used_cells} containers\nComputing a solution..."
         self.display_message(message)
         self.show_all(self.ui.MessageLhsLayout)

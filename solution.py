@@ -29,6 +29,9 @@ class Solution:
         states.reverse()
         return states
     
+    def get_time_to_execute(self) -> int:
+        return self.goal_node.get_cost()
+    
     def __str__(self) -> str:
         output = f"Num of moves: {len(self.get_actions())}:\n"
         for action in self.get_actions():

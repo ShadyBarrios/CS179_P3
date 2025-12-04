@@ -53,7 +53,6 @@ class Node:
 
     def next_action_type(self) -> ActionTypes:
         if self.meets_criteria_b():
-            print(f"Met by {self.get_action()}")
             return ActionTypes.ToPark
 
         match(self.action_type):

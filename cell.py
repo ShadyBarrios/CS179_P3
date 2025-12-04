@@ -144,15 +144,12 @@ class ParkCell(Cell):
     
     def update_park(self, status:TargetTypes):
         if status == None or not(isinstance(status, TargetTypes)):
-            print("star")
             self.parkLabel.setProperty("cls", "PARK")
         else:
             if status == TargetTypes.SOURCE:
                 self.parkLabel.setProperty("cls", "SOURCE")
             else:
                 self.parkLabel.setProperty("cls", "TARGET")
-
-        print(self.parkLabel.text())
         
         self.parkLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.parkLabel.style().unpolish(self.parkLabel)

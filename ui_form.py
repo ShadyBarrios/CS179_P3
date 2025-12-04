@@ -69,7 +69,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayoutWidget_3 = QWidget(self.ShipGridPage)
         self.horizontalLayoutWidget_3.setObjectName(u"horizontalLayoutWidget_3")
-        self.horizontalLayoutWidget_3.setGeometry(QRect(30, 10, 871, 171))
+        self.horizontalLayoutWidget_3.setGeometry(QRect(30, 10, 871, 178))
         self.MessageLayouts = QHBoxLayout(self.horizontalLayoutWidget_3)
         self.MessageLayouts.setObjectName(u"MessageLayouts")
         self.MessageLayouts.setContentsMargins(0, 0, 0, 0)
@@ -159,33 +159,34 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.MoveHistoryLabel = QLabel(self.horizontalLayoutWidget_3)
         self.MoveHistoryLabel.setObjectName(u"MoveHistoryLabel")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.MoveHistoryLabel.sizePolicy().hasHeightForWidth())
+        self.MoveHistoryLabel.setSizePolicy(sizePolicy)
 
         self.verticalLayout_5.addWidget(self.MoveHistoryLabel)
 
-        self.scrollArea = QScrollArea(self.horizontalLayoutWidget_3)
-        self.scrollArea.setObjectName(u"scrollArea")
-        self.scrollArea.setWidgetResizable(True)
+        self.PreviousMovesScrollArea = QScrollArea(self.horizontalLayoutWidget_3)
+        self.PreviousMovesScrollArea.setObjectName(u"PreviousMovesScrollArea")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.MinimumExpanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.PreviousMovesScrollArea.sizePolicy().hasHeightForWidth())
+        self.PreviousMovesScrollArea.setSizePolicy(sizePolicy1)
+        self.PreviousMovesScrollArea.setMinimumSize(QSize(0, 125))
+        self.PreviousMovesScrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 425, 141))
-        self.horizontalLayoutWidget_5 = QWidget(self.scrollAreaWidgetContents)
-        self.horizontalLayoutWidget_5.setObjectName(u"horizontalLayoutWidget_5")
-        self.horizontalLayoutWidget_5.setGeometry(QRect(9, 9, 561, 121))
-        self.horizontalLayout_2 = QHBoxLayout(self.horizontalLayoutWidget_5)
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.PreviousMovesLabel = QLabel(self.horizontalLayoutWidget_5)
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 425, 148))
+        self.PreviousMovesLabel = QLabel(self.scrollAreaWidgetContents)
         self.PreviousMovesLabel.setObjectName(u"PreviousMovesLabel")
+        self.PreviousMovesLabel.setGeometry(QRect(10, 10, 411, 131))
+        sizePolicy1.setHeightForWidth(self.PreviousMovesLabel.sizePolicy().hasHeightForWidth())
+        self.PreviousMovesLabel.setSizePolicy(sizePolicy1)
+        self.PreviousMovesScrollArea.setWidget(self.scrollAreaWidgetContents)
 
-        self.horizontalLayout_2.addWidget(self.PreviousMovesLabel)
-
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_2.addItem(self.horizontalSpacer_7)
-
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-
-        self.verticalLayout_5.addWidget(self.scrollArea)
+        self.verticalLayout_5.addWidget(self.PreviousMovesScrollArea)
 
 
         self.MessagesRhsLayout.addLayout(self.verticalLayout_5)
@@ -262,7 +263,7 @@ class Ui_MainWindow(object):
         self.FinishedPage.setObjectName(u"FinishedPage")
         self.verticalLayoutWidget_3 = QWidget(self.FinishedPage)
         self.verticalLayoutWidget_3.setObjectName(u"verticalLayoutWidget_3")
-        self.verticalLayoutWidget_3.setGeometry(QRect(10, 79, 911, 91))
+        self.verticalLayoutWidget_3.setGeometry(QRect(10, 29, 911, 141))
         self.verticalLayout_3 = QVBoxLayout(self.verticalLayoutWidget_3)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
@@ -380,7 +381,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.AllPages.setCurrentIndex(0)
+        self.AllPages.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(MainWindow)

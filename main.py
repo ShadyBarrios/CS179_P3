@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
 from main_window import *
 from components import Components
 from cell import global_stylesheet
@@ -17,7 +17,8 @@ def main():
     components.ui.CancelCommentButton.clicked.connect(components.cancel_comment)
     components.ui.ToCommentButton.clicked.connect(components.to_log_comment)
     components.ui.LogCommentButton.clicked.connect(components.log_comment)
-    components.ui.SuccessRestartButton.clicked.connect(components.successful_restart)
+    components.ui.SuccessRestartButton.clicked.connect(components.restart)
+    widget.addComponents(components)
     widget.show()
     sys.exit(app.exec())
 

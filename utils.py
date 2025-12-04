@@ -1,9 +1,8 @@
 from PySide6 import QtWidgets
 from manifest import ManifestItem
 from crane_moves import CraneMoves
-from cell import CellTypes
 from pathlib import Path
-from action import ActionTypes
+import time
 
 def get_all_children_items(item) -> list[QtWidgets.QWidget]:
     children = []
@@ -66,3 +65,25 @@ def source_styling(txt:str) -> str:
 
 def target_styling(txt:str) -> str:
     return f"<span style='color: red;'>{txt}</span>"
+
+def get_time_parts(timeStruct:time.struct_time) -> tuple[int,int,int,int,int]:
+    month = timeStruct.tm_mon
+    day = timeStruct.tm_mday
+    year = timeStruct.tm_year
+    hour = timeStruct.tm_hour
+    minute = timeStruct.tm_min
+
+    return month, day, year, hour, minute
+
+def parse_time(currTime:time.struct_time) -> str:
+    month, day, year, hour, minute = get_time_parts(currTime)
+
+    return f"{month:02d} {day:02d} {year}: {hour:02d}:{minute:02d} "
+
+def to_directory_name(timeCreated:time.struct_time) -> str:
+    month, day, year, hour, minute = get_time_parts(timeCreated)
+    
+    return f"KeoghsPort{month:02d}_{day:02d}_{year}_{hour:02d}{minute:02d}"
+
+def to_log_file_name(timeCreated:time.struct_time) -> str:
+    return to_directory_name(timeCreated) + ".txt"

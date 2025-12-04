@@ -15,8 +15,10 @@ class State:
         grid = self.grid
         for row in grid:
             for item in row:
-                output += str(item.get_weight()) + " "
-            output += "\n"
+                coordinate = f"{item.get_coordinate()}"
+                weight = f"{item.get_weight():06d}"
+                title = f"{item.get_title()}"
+                output += coordinate + ", {" + weight + "}, " + title + "\n" 
         return output
 
     def _copy_grid(self) -> list[list[ManifestItem]]:

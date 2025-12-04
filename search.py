@@ -9,7 +9,7 @@ class Search():
         self.initial_node = Node(initial_state)
 
     def a_star_search(self):
-        print("running")
+        print("Starting search")
         frontier = PriorityQueue()
 
         # first_run = True
@@ -26,7 +26,6 @@ class Search():
         explored.add(self.initial_node)
 
         if self.initial_node.meets_criteria_b():
-            print("wow")
             return Solution(None)
 
         while not frontier.empty():
@@ -70,5 +69,4 @@ class Search():
             # break
 
         # if full frontier examined then that means last node is minimum
-        print('uhoh')
         return Solution(node_bsf.to_park())

@@ -14,3 +14,11 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+    def addComponents(self, components):
+        self.components = components
+    
+    def closeEvent(self, event):
+        self.components.log_exit_app()
+        event.accept()
+        super().closeEvent(event)
