@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore, QtGui
 from main_window import *
 from components import Components
 from cell import global_stylesheet
@@ -9,6 +9,8 @@ from cell import global_stylesheet
 def main():
     app = QApplication(sys.argv)
     widget = MainWindow()
+    favicon_pixmap = QtGui.QPixmap("imgs/boat-favicon.png")
+    widget.setWindowIcon(favicon_pixmap)
     widget.setStyleSheet(global_stylesheet)
     components = Components(widget.ui)
     components.ui.FilePickButton.clicked.connect(components.start_app)
