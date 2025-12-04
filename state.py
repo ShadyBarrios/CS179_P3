@@ -1,4 +1,3 @@
-import copy
 from action import Action, ActionTypes
 from cell import CellTypes
 from coordinate import Coordinate
@@ -291,22 +290,21 @@ class State:
             case ActionTypes.ToItem:
                 return self.copy()
             case ActionTypes.MoveItem:
-                source = action.source.copy()
-                target = action.target.copy()
+                source_coordinate = action.source.get_coordinate().copy()
+                target_coordinate = action.target.get_coordinate().copy()
 
-                source_coordinate = source.get_coordinate().copy()
-                target_coordinate = target.get_coordinate().copy()
+                updated_grid = self._copy_grid()
 
-                updated_grid = copy.deepcopy(self.grid)
+                source = updated_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1].copy()
+                source.set_coordinate(target_coordinate)
 
                 # moves source object to target object
                 updated_grid[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source
-                # update new target object's coordinates
-                updated_grid[target_coordinate.get_row()-1][target_coordinate.get_col()-1].set_coordinate(target_coordinate)
+
                 # update old source coordinate with empty object
                 updated_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
         
-                return State(updated_grid)
+                return State(updated_grid, target_coordinate)
             case ActionTypes.ToPark:
                 return self.copy()
 
