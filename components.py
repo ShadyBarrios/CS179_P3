@@ -129,7 +129,6 @@ class Components(QtCore.QObject):
         self.solutionIdx = 0 
         self.display_solution()
         self.show_all(self.ui.MessageLayouts)
-        self.ui.ContinueButton.clicked.connect(self.display_solution)
 
     def display_solution(self):
         idx = self.solutionIdx
@@ -173,6 +172,8 @@ class Components(QtCore.QObject):
     def display_no_moves_needed(self):
         self.throw_error("No moves needed! Crate layout already meets criteria.")
 
+    # TODO: delete label in history
+    # TODO: allow scroll in history
     def end_reached(self):
         self.solutionIdx = 0
         self.solutionStates = None

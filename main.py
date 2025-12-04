@@ -13,6 +13,7 @@ def main():
     components = Components(widget.ui)
     components.ui.FilePickButton.clicked.connect(components.start_app)
     components.ui.ErrorRestartButton.clicked.connect(components.restart)
+    components.ui.ContinueButton.clicked.connect(components.display_solution)
     widget.show()
     sys.exit(app.exec())
 
