@@ -102,7 +102,6 @@ class Node:
         for action in actions:
             new_state = current_state.move(action, next_action_type)
             node = Node(new_state, self.cost, action, parent=self, action_type=next_action_type)
-            print(f"man {node.manhattan_dist()}")
             node.add_cost(node.manhattan_dist())
             children.append(node)
         return children

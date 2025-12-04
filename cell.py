@@ -18,6 +18,7 @@ QLabel[cls="TARGET"] { padding-top:18px; padding-bottom:18px; padding-left:10px;
 QLabel[cls="SOURCE"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(60, 179, 133, 0.5); color:BLACK; }
 QLabel[cls="PORT"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black;background-color:WHITE; color:WHITE; }
 QLabel[cls="STARBOARD"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:GRAY; color:GRAY; }
+QLabel[cls="PARK"] { border: 2px solid black; background-color:GRAY; color:GRAY; }
 """
 
 class TargetTypes(Enum):
@@ -144,7 +145,7 @@ class ParkCell(Cell):
     def update_park(self, status:TargetTypes):
         if status == None or not(isinstance(status, TargetTypes)):
             print("star")
-            self.parkLabel.setProperty("cls", "STARBOARD")
+            self.parkLabel.setProperty("cls", "PARK")
         else:
             if status == TargetTypes.SOURCE:
                 self.parkLabel.setProperty("cls", "SOURCE")

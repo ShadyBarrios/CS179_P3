@@ -75,6 +75,10 @@ class Ui_MainWindow(object):
         self.MessageLayouts.setContentsMargins(0, 0, 0, 0)
         self.MessagesLhsLayout = QVBoxLayout()
         self.MessagesLhsLayout.setObjectName(u"MessagesLhsLayout")
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.MessagesLhsLayout.addItem(self.verticalSpacer_3)
+
         self.verticalLayout_4 = QVBoxLayout()
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.MessageLhsLayout = QHBoxLayout()
@@ -91,12 +95,21 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addLayout(self.MessageLhsLayout)
 
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_4.addItem(self.verticalSpacer_2)
+
         self.ParkLayout = QHBoxLayout()
         self.ParkLayout.setObjectName(u"ParkLayout")
+        self.ParkLabelLayout = QVBoxLayout()
+        self.ParkLabelLayout.setObjectName(u"ParkLabelLayout")
         self.ParkLabel = QLabel(self.horizontalLayoutWidget_3)
         self.ParkLabel.setObjectName(u"ParkLabel")
 
-        self.ParkLayout.addWidget(self.ParkLabel)
+        self.ParkLabelLayout.addWidget(self.ParkLabel)
+
+
+        self.ParkLayout.addLayout(self.ParkLabelLayout)
 
         self.ContinueLayout = QHBoxLayout()
         self.ContinueLayout.setObjectName(u"ContinueLayout")
@@ -367,7 +380,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.AllPages.setCurrentIndex(1)
+        self.AllPages.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -376,7 +389,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Keogh's Port App by CyberSmiths", None))
         self.MessageLhsLabel.setText(QCoreApplication.translate("MainWindow", u"LHS Message", None))
-        self.ParkLabel.setText(QCoreApplication.translate("MainWindow", u"Park", None))
+        self.ParkLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.ContinueButton.setText(QCoreApplication.translate("MainWindow", u"Continue", None))
         self.WhenDoneLabel.setText(QCoreApplication.translate("MainWindow", u"when done", None))
         self.ToCommentButton.setText(QCoreApplication.translate("MainWindow", u"Log Comment", None))

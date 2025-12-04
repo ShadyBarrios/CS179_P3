@@ -24,12 +24,6 @@ class CraneMoves(Enum):
         if (target_row == 8) and (curr_col == target_col): # crane is below park
             return CraneMoves.MoveUp
         
-        if (curr_row == target_row):
-            if (curr_col == target_col - 1): # crane is directly to left of item
-                return CraneMoves.MoveRight
-            elif (curr_col == target_col + 1): # crane is directly to right of item
-                return CraneMoves.MoveLeft
-        
         if (curr_col < target_col): # crane is to left of item
             item_right = CellTypes.to_type(grid[curr_row][curr_col+1].get_title())
             if item_right != CellTypes.UNUSED:
