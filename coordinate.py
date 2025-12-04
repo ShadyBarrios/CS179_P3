@@ -18,5 +18,8 @@ class Coordinate:
         display_col = self.loc[1] # "12 -" for display
         return f"[{display_row:02d},{display_col:02d}]"
     
+    def __hash__(self) -> int:
+        return hash(self.loc)
+    
     def copy(self):
         return Coordinate(self.loc[0], self.loc[1])

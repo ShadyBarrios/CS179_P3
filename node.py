@@ -65,7 +65,7 @@ class Node:
             
     
     def get_weights(self) -> tuple[int, int]:
-        return self.state.get_weights()
+        return self.state.get_side_weights()
 
     # f(n) = g(n) + h(n)
     def get_total_cost(self) -> float:

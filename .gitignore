@@ -86,4 +86,4 @@ CMakeLists.txt.user*
 CS179_P3.pyproject
 CS179_P3.pyproject.user
 
-tests/
+examples/
