@@ -119,7 +119,6 @@ class State:
                 starboard_weights.append(starboard_col_weights)
 
         return port_weights, starboard_weights
-
     
     # Get movable items for a specific grid
     def _get_movable_items(grid: list[list[ManifestItem]]) -> list[ManifestItem]:
@@ -316,27 +315,48 @@ class State:
     #     return max(0, criteria_b_calc)
 
     def calculate_heuristic(self) -> int:
+        result = 0
         port_side, starboard_side = self.get_sides()
         port_side_weight, starboard_side_weight = self.get_side_weights()
         total_weight = port_side_weight + starboard_side_weight
-        
-        criteria = total_weight * 0.10
 
-        crate_distances = []
+        balance_mass = total_weight//2
+
+        side_containers = []
         if port_side_weight > starboard_side_weight:
+            # Find all containers on a side
+            deficit = balance_mass - starboard_side_weight
             for row in port_side:
                 for item in row:
-                    if item.get_weight() >= criteria:
-                        crate_distances.append((7-item.get_col()))
-            crate_distances.sort()
-            return crate_distances[0]
+                    if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                        side_containers.append((item.get_col(), item.get_weight()))
+
+            # Sort all containers on the side by weight in descending order
+            side_containers.sort(key=lambda t: t[1], reverse=True)
+
+            for column, weight in side_containers:
+                # Find largest container(s) that are within criteria and accumulate their distance to centerline
+                if weight <= deficit:
+                    result += 7-column
+                    break
+            
         else:
+            deficit = balance_mass - port_side_weight
             for row in starboard_side:
                 for item in row:
-                    if item.get_weight() >= criteria:
-                        crate_distances.append(abs(6-item.get_col()))
-            crate_distances.sort()
-            return crate_distances[0]
+                    if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                        side_containers.append((item.get_col(), item.get_weight()))
+            
+            # Sort all containers on the side by weight in descending order
+            side_containers.sort(key=lambda t: t[1], reverse=True)
+            
+            for column, weight in side_containers:
+                # Find largest container(s) that are within criteria and accumulate their distance to centerline
+                if weight <= deficit:
+                    result += column-6
+                    break
+
+        return result
 
     def calculate_criteria_b(self) -> float:
         port_side_weight, starboard_side_weight = self.get_side_weights()
