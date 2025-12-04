@@ -63,7 +63,7 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="ShipGridPage">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -373,6 +373,26 @@
           <widget class="QPushButton" name="LogCommentButton">
            <property name="text">
             <string>Log Comment</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_21">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="CancelCommentButton">
+           <property name="text">
+            <string>Cancel</string>
            </property>
           </widget>
          </item>

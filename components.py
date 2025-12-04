@@ -140,7 +140,7 @@ class Components(QtCore.QObject):
         print(f"Here {len(actions)} | {self.solutionIdx}")
         if len(actions) == 0: # no moves needed
             self.display_no_moves_needed()
-        elif self.solutionIdx == len(actions): # end reached
+        elif self.solutionIdx >= len(actions): # end reached
             self.end_reached()
         else:
             state = states[idx]
@@ -172,7 +172,6 @@ class Components(QtCore.QObject):
     def display_no_moves_needed(self):
         self.throw_error("No moves needed! Crate layout already meets criteria.")
 
-    # TODO: delete label in history
     # TODO: allow scroll in history
     def end_reached(self):
         self.solutionIdx = 0
@@ -184,20 +183,28 @@ class Components(QtCore.QObject):
         print('resetting')
         self.restart()
 
+    def to_log_comment(self):
+        pass
+
+    def to_success_page(self):
+        pass
+
+    def cancel_comment(self):
+        pass
+
+    def log_comment(self):
+        pass
+
+    def to_success_page(self):
+        pass
+
+    def successful_restart(self):
+        pass
+
     def reset_previous_moves(self):
         self.ui.PreviousMovesLabel.setText("")
 
     def reset_grid_display(self):
-        # cell_grid = self.grid_display.cell_grid
-        # for row in cell_grid:
-        #     for cell in row:
-        #         self.ui.ShipGrid.removeWidget(cell.label)
-        
-        # this doesn't work too
-        # self.ui.ShipGrid = QtWidgets.QGridLayout()
-        # print("new shipgrid")
-
-        # THIS WORKS!
         while self.ui.ShipGrid.count():
             item = self.ui.ShipGrid.takeAt(0)
             item.widget().deleteLater()

@@ -41,6 +41,10 @@ class Node:
     
     def to_park(self):
         current_state = self.get_state()
+
+        if current_state.crane == Coordinate(9,1): # already at park
+            return self
+        
         action = current_state.generate_actions(ActionTypes.ToPark)[0] # returns 1
         new_state = current_state.move(action, ActionTypes.ToPark)
         node = Node(new_state, self.cost, action, parent=self, action_type=ActionTypes.ToPark)
@@ -98,6 +102,7 @@ class Node:
         for action in actions:
             new_state = current_state.move(action, next_action_type)
             node = Node(new_state, self.cost, action, parent=self, action_type=next_action_type)
+            print(f"man {node.manhattan_dist()}")
             node.add_cost(node.manhattan_dist())
             children.append(node)
         return children

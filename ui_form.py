@@ -228,6 +228,15 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.LogCommentButton)
 
+        self.horizontalSpacer_21 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_21)
+
+        self.CancelCommentButton = QPushButton(self.verticalLayoutWidget_2)
+        self.CancelCommentButton.setObjectName(u"CancelCommentButton")
+
+        self.horizontalLayout_5.addWidget(self.CancelCommentButton)
+
         self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer_13)
@@ -358,7 +367,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.AllPages.setCurrentIndex(0)
+        self.AllPages.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -375,6 +384,7 @@ class Ui_MainWindow(object):
         self.PreviousMovesLabel.setText("")
         self.InsertCommentLabel.setText(QCoreApplication.translate("MainWindow", u"Insert Comment Here", None))
         self.LogCommentButton.setText(QCoreApplication.translate("MainWindow", u"Log Comment", None))
+        self.CancelCommentButton.setText(QCoreApplication.translate("MainWindow", u"Cancel", None))
         self.SuccessMessageLabel.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.SuccessRestartButton.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
         self.FilePickLabel.setText(QCoreApplication.translate("MainWindow", u"Enter a manifest (must be .txt):", None))
