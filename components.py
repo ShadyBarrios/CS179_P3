@@ -180,8 +180,12 @@ class Components(QtCore.QObject):
         self.solutionActions = None
         self.currentMove = None
         self.reset_grid_display()
+        self.reset_previous_moves()
         print('resetting')
         self.restart()
+
+    def reset_previous_moves(self):
+        self.ui.PreviousMovesLabel.setText("")
 
     def reset_grid_display(self):
         # cell_grid = self.grid_display.cell_grid
@@ -243,6 +247,7 @@ class Components(QtCore.QObject):
         self.show_all(self.ui.MessageLhsLayout)
         self.show_all(self.ui.ParkLayout)
         self.hide_all(self.ui.ContinueLayout)
+        self.hide_all(self.ui.ToCommentLayout)
 
     def display_message(self, message: str):
         self.ui.MessageLhsLabel.setText(message)

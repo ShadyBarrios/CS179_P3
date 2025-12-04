@@ -113,18 +113,23 @@ class Ui_MainWindow(object):
 
         self.ParkLayout.addLayout(self.ContinueLayout)
 
-        self.horizontalSpacer_20 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.ParkLayout.addItem(self.horizontalSpacer_20)
-
-        self.ToCommentButton = QPushButton(self.horizontalLayoutWidget_3)
-        self.ToCommentButton.setObjectName(u"ToCommentButton")
-
-        self.ParkLayout.addWidget(self.ToCommentButton)
-
         self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.ParkLayout.addItem(self.horizontalSpacer_8)
+
+        self.ToCommentLayout = QHBoxLayout()
+        self.ToCommentLayout.setObjectName(u"ToCommentLayout")
+        self.ToCommentButton = QPushButton(self.horizontalLayoutWidget_3)
+        self.ToCommentButton.setObjectName(u"ToCommentButton")
+
+        self.ToCommentLayout.addWidget(self.ToCommentButton)
+
+
+        self.ParkLayout.addLayout(self.ToCommentLayout)
+
+        self.horizontalSpacer_20 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.ParkLayout.addItem(self.horizontalSpacer_20)
 
 
         self.verticalLayout_4.addLayout(self.ParkLayout)
@@ -353,7 +358,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.AllPages.setCurrentIndex(4)
+        self.AllPages.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
