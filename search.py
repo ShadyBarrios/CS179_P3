@@ -2,11 +2,11 @@ from solution import Solution
 from node import Node
 from queue import PriorityQueue
 from state import State
-from sys import maxsize as intmax # needed for bsf weight diff
 
 class Search():
-    def __init__(self, initial_state:State):
+    def __init__(self, initial_state: State):
         self.initial_state = initial_state
+        self.initial_node = Node(initial_state)
 
     def a_star_search(self):
         print("running")
@@ -14,26 +14,26 @@ class Search():
 
         # first_run = True
 
-        node_bsf:Node = None
-        node_bsf_weight_diff:int = intmax # will be used to track
-        node_bsf_cost:int = intmax
+        node_bsf: Node = None
+        node_bsf_weight_diff = float('inf') # will be used to track
+        node_bsf_cost = float('inf')
 
         # for fast lookup
         frontier_list = []
         explored = []
 
-        start_state = self.initial_state.copy()
-        start = Node(start_state.get_grid(), cost=0, heuristic=start_state.calculate_heuristic())
-        print(f"Chose {start.get_action()} | {start.actionType} | {start.get_weight_diff()} | {start.meets_criteria_b()} | {start.get_total_cost()}")
-        frontier.put(start)
-        frontier_list.append(start)
+        # start_state = self.initial_state.copy()
+        # start = Node(start_state, cost=0, heuristic=start_state.calculate_heuristic())
+        # print(f"Chose {start.get_action()} | {start.actionType} | {start.get_weight_diff()} | {start.meets_criteria_b()} | {start.get_total_cost()}")
+        frontier.put(self.initial_node)
+        frontier_list.append(self.initial_node)
 
-        if start.meets_criteria_b():
+        if self.initial_node.meets_criteria_b():
             print("wow")
             return Solution(None)
 
         while not frontier.empty():
-            node:Node = frontier.get()
+            node: Node = frontier.get()
             
             print(f"Chose {node.get_action()} | {node.actionType} | {node.get_weight_diff()} | {node.get_total_cost()}")
             node_weight_diff = node.get_weight_diff()
@@ -58,7 +58,7 @@ class Search():
             explored.append(node)
 
             # expand node and then add to frontier
-            child:Node = None
+            child: Node = None
             for child in sorted(node.generate_children()):
                 # if first_run:
                 #     print(f"{child.get_action()} | {child.get_total_cost()} | {child.get_heuristic()}")
