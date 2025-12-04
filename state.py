@@ -30,11 +30,11 @@ class State:
 
     def copy(self):
         grid_copy = self._copy_grid()
-        return State(grid_copy)
+        crane_copy = self.crane.copy()
+        return State(grid_copy, crane_copy)
     
-    
-    def copy_with_new_crane(self, crane:Coordinate):
-        return State(self._copy_grid(), crane.copy())
+    # def copy_with_new_crane(self, crane:Coordinate):
+    #     return State(self._copy_grid(), crane.copy())
     
     def get_crane(self) -> Coordinate:
         return self.crane
@@ -200,8 +200,22 @@ class State:
         if not isinstance(rhs, State):
             return False
         column_equality = self.__compare_weight_columns__(rhs)
-        return column_equality
+        crane_equality = self.__compare_cranes__(rhs)
+        return column_equality and crane_equality
     
+    def __hash__(self) -> int:
+        port_weights, starboard_weights = self.get_side_weight_lists()
+
+        # convert list[list[int]] to list[tuple[int]]
+        port_weights_sorted = sorted([tuple(column) for column in port_weights])
+        starboard_weights_sorted = sorted([tuple(column) for column in starboard_weights])
+
+        # convert to tuple[tuple[int]]
+        port_weights_final = tuple(port_weights_sorted)
+        starboard_weights_final = tuple(starboard_weights_sorted)
+
+        return hash((port_weights_final, starboard_weights_final, self.crane))
+
     # compares to see that both grids have the same weight columns on the same sides (or mirrored)
     def __compare_weight_columns__(self, rhs) -> bool:
         if not isinstance(rhs, State):
@@ -248,6 +262,11 @@ class State:
 
     #     return equal_movable or equal_movable_mirrored
     
+    def __compare_cranes__(self, rhs) -> bool:
+        if not isinstance(rhs, State):
+            return False
+        return self.crane == rhs.get_crane()
+
     # calculates all the possible operations from the current state, based on actionType
     def generate_actions(self, actionType:ActionTypes) -> list[Action]:
         actions = []
@@ -283,29 +302,30 @@ class State:
 
     # swaps coordinates of source and target, returns a new state
     def move(self, action: Action, action_type: ActionTypes):
+        new_grid = self._copy_grid()
+        target_coordinate = action.target.get_coordinate().copy()
+        
         match(action_type):
             case ActionTypes.FromPark:
-                return self.copy()
+                return State(new_grid, target_coordinate) 
             case ActionTypes.ToItem:
-                return self.copy()
+                return State(new_grid, target_coordinate)
             case ActionTypes.MoveItem:
                 source_coordinate = action.source.get_coordinate().copy()
-                target_coordinate = action.target.get_coordinate().copy()
 
-                updated_grid = self._copy_grid()
 
-                source = updated_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1].copy()
+                source = new_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1].copy()
                 source.set_coordinate(target_coordinate)
 
                 # moves source object to target object
-                updated_grid[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source
+                new_grid[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source
 
                 # update old source coordinate with empty object
-                updated_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
+                new_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
         
-                return State(updated_grid, target_coordinate)
+                return State(new_grid, target_coordinate)
             case ActionTypes.ToPark:
-                return self.copy()
+                return State(new_grid, target_coordinate)
 
     # criteria b: |Ph - Sh| < =(Sum(Po, So) * 0.10), so expected is |Ph-Sh| >= (Sum(Po, So) * 0.1) therefore |Ph - Sh| - (sum(Po, So) * 10) >= 0
     # therefore, an admissible heurstic would be |Ph - Sh| - (sum(Po, So) * 10)

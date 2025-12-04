@@ -1,19 +1,16 @@
 from action import Action, ActionTypes
-from manifest import ManifestItem
 from state import State
 from utils import manhattan_dist
 from coordinate import Coordinate
 
 class Node:
-    def __init__(self, grid: list[list[ManifestItem]], cost: int=0, heuristic: float=0, action: Action=None, children=None, parent=None, crane=Coordinate(9,1), actionType = ActionTypes.FromPark):
-        self.state = State(grid, crane)
+    def __init__(self, state: State, cost: int=0, action: Action=None, parent=None, action_type = ActionTypes.FromPark):
+        self.state = state
         self.cost = cost # g(n)
-        self.heuristic = heuristic # h(n)
+        self.heuristic = state.calculate_heuristic() # h(n)
         self.action = action
-        self.children = children
         self.parent = parent
-        self.actionType = actionType
-        self.crane = crane
+        self.action_type = action_type
         self.row_count = 8
         self.col_count = 12
 
@@ -23,15 +20,17 @@ class Node:
 
         comp_states = self.state == rhs.state
 
-        comp_actions_crane_matters = (self.actionType == ActionTypes.MoveItem) and (rhs.actionType == ActionTypes.MoveItem) # both got done moving items
-        comp_crane = self.crane == rhs.crane
+        comp_actions_crane_matters = (self.action_type == ActionTypes.MoveItem) and (rhs.action_type == ActionTypes.MoveItem) # both got done moving items
         
-        comp_actions_crane_doesnt_matter = (self.actionType != ActionTypes.MoveItem) and (rhs.actionType != ActionTypes.MoveItem)
+        comp_actions_crane_doesnt_matter = (self.action_type != ActionTypes.MoveItem) and (rhs.action_type != ActionTypes.MoveItem)
 
-        comp_actions = self.actionType == rhs.actionType
+        comp_actions = self.action_type == rhs.action_type
 
         # return (comp_states and (comp_actions_crane_doesnt_matter or (comp_actions_crane_matters and comp_crane)))
-        return (comp_states and comp_actions and comp_crane)
+        return (comp_states and comp_actions)
+    
+    def __hash__(self) -> int:
+        return hash((self.state, self.action_type))
     
     def __lt__(self, rhs):
         if not(isinstance(rhs, Node)):
@@ -44,18 +43,16 @@ class Node:
         current_state = self.get_state()
         action = current_state.generate_actions(ActionTypes.ToPark)[0] # returns 1
         new_state = current_state.move(action, ActionTypes.ToPark)
-        crane = action.target.get_coordinate().copy()
-        heuristic = new_state.calculate_heuristic()
-        node = Node(new_state.get_grid(), self.cost, heuristic, action, children=None, parent=self, crane=crane, actionType=ActionTypes.ToPark)
+        node = Node(new_state, self.cost, action, parent=self, action_type=ActionTypes.ToPark)
         node.add_cost(node.manhattan_dist())
-        return node  
+        return node
 
     def next_action_type(self) -> ActionTypes:
         if self.meets_criteria_b():
             print(f"Met by {self.get_action()}")
             return ActionTypes.ToPark
 
-        match(self.actionType):
+        match(self.action_type):
             case ActionTypes.FromPark:
                 return ActionTypes.ToItem
             case ActionTypes.ToItem:
@@ -69,7 +66,7 @@ class Node:
 
     # f(n) = g(n) + h(n)
     def get_total_cost(self) -> float:
-        return self.get_cost() + self.get_heuristic()
+        return self.cost + self.heuristic
 
     def get_cost(self) -> int:
         return self.cost
@@ -79,10 +76,6 @@ class Node:
 
     def get_heuristic(self) -> float:
         return self.heuristic
-
-    def get_children(self):
-        children:list[Node] = self.children
-        return children
 
     def get_parent(self):
         parent:Node = self.parent
@@ -95,18 +88,16 @@ class Node:
         return self.action
     
     def generate_children(self):
-        children:list[Node] = []
+        children: list[Node] = []
 
-        current_state = self.get_state()
+        current_state = self.state
 
-        action:Action = None
+        action: Action = None
         next_action_type = self.next_action_type()
         actions = current_state.generate_actions(next_action_type)
         for action in actions:
             new_state = current_state.move(action, next_action_type)
-            crane = action.target.get_coordinate().copy()
-            heuristic = new_state.calculate_heuristic()
-            node = Node(new_state.get_grid(), self.cost, heuristic, action, children=None, parent=self, crane=crane, actionType=next_action_type)
+            node = Node(new_state, self.cost, action, parent=self, action_type=next_action_type)
             node.add_cost(node.manhattan_dist())
             children.append(node)
         return children
