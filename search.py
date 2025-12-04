@@ -19,14 +19,11 @@ class Search():
         node_bsf_cost = float('inf')
 
         # for fast lookup
-        frontier_list = []
-        explored = []
+        explored = set()
 
-        # start_state = self.initial_state.copy()
-        # start = Node(start_state, cost=0, heuristic=start_state.calculate_heuristic())
-        # print(f"Chose {start.get_action()} | {start.actionType} | {start.get_weight_diff()} | {start.meets_criteria_b()} | {start.get_total_cost()}")
+        print(f"Chose {self.initial_node.get_action()} | {self.initial_node.action_type} | {self.initial_node.get_weight_diff()} | {self.initial_node.meets_criteria_b()} | {self.initial_node.get_total_cost()}")
         frontier.put(self.initial_node)
-        frontier_list.append(self.initial_node)
+        explored.add(self.initial_node)
 
         if self.initial_node.meets_criteria_b():
             print("wow")
@@ -35,7 +32,7 @@ class Search():
         while not frontier.empty():
             node: Node = frontier.get()
             
-            print(f"Chose {node.get_action()} | {node.actionType} | {node.get_weight_diff()} | {node.get_total_cost()}")
+            print(f"Chose {node.get_action()} | {node.action_type} | {node.get_weight_diff()} | {node.get_total_cost()}")
             node_weight_diff = node.get_weight_diff()
             node_cost = node.get_cost()
             
@@ -54,18 +51,17 @@ class Search():
                 node_bsf_cost = node_cost
                 node_bsf = node
 
-            frontier_list.remove(node)
-            explored.append(node)
+            explored.add(node)
 
             # expand node and then add to frontier
             child: Node = None
-            for child in sorted(node.generate_children()):
+            for child in node.generate_children():
                 # if first_run:
                 #     print(f"{child.get_action()} | {child.get_total_cost()} | {child.get_heuristic()}")
                
-                if child not in explored and child not in frontier_list:
-                    frontier.put(child)
-                    frontier_list.append(child)
+               if child not in explored:
+                   frontier.put(child)
+
             #         if first_run:
             #             print(f"ADDED: {child.get_action()} | {child.get_total_cost()} | {child.get_heuristic()}")
                         

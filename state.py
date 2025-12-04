@@ -203,6 +203,19 @@ class State:
         crane_equality = self.__compare_cranes__(rhs)
         return column_equality and crane_equality
     
+    def __hash__(self) -> int:
+        port_weights, starboard_weights = self.get_side_weight_lists()
+
+        # convert list[list[int]] to list[tuple[int]]
+        port_weights_sorted = sorted([tuple(column) for column in port_weights])
+        starboard_weights_sorted = sorted([tuple(column) for column in starboard_weights])
+
+        # convert to tuple[tuple[int]]
+        port_weights_final = tuple(port_weights_sorted)
+        starboard_weights_final = tuple(starboard_weights_sorted)
+
+        return hash((port_weights_final, starboard_weights_final, self.crane))
+
     # compares to see that both grids have the same weight columns on the same sides (or mirrored)
     def __compare_weight_columns__(self, rhs) -> bool:
         if not isinstance(rhs, State):
