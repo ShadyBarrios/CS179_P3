@@ -236,6 +236,7 @@ class Components(QtCore.QObject):
         self.currentMove = None
         self.reset_grid_display()
         self.reset_previous_moves()
+        self.log_completed_cycle()
         self.to_success_page()
 
     def to_log_comment(self):
