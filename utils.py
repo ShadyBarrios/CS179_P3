@@ -76,7 +76,6 @@ def get_time_parts(timeStruct:time.struct_time) -> tuple[int,int,int,int,int]:
     return month, day, year, hour, minute
 
 def parse_time(currTime:time.struct_time) -> str:
-    print(currTime)
     month, day, year, hour, minute = get_time_parts(currTime)
 
     return f"{month:02d} {day:02d} {year}: {hour:02d}:{minute:02d} "
@@ -88,3 +87,8 @@ def to_directory_name(timeCreated:time.struct_time) -> str:
 
 def to_log_file_name(timeCreated:time.struct_time) -> str:
     return to_directory_name(timeCreated) + ".txt"
+
+def quantify(numItems:int):
+    if numItems == 1:
+        return f"is {numItems}"
+    return f"are {numItems}"

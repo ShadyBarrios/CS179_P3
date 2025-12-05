@@ -76,6 +76,7 @@ class Components(QtCore.QObject):
         self.solutionIdx = 0
         self.currentMove:str = None
         self.lastAction = None
+        self.lastActionType = None
         self.lastMove = None
         self.start_log()
         
@@ -116,24 +117,33 @@ class Components(QtCore.QObject):
         self.src_file_name = file_name
         self.file_root_name = get_file_root_name(file_name)
         self.outbound_file_name = self.file_root_name + "OUTBOUND" + ".txt"
-        self.begin(grid_parse)
-        return grid_parse
+        validShip = self.begin(grid_parse)
+        if validShip:
+            return grid_parse
+        else:
+            return None
 
-    def begin(self, grid_parse: list[ManifestItem]):
+    def begin(self, grid_parse: list[ManifestItem]) :
         self.set_page(Pages.ShipGridPage)
         self.hide_all(self.ui.MessageLayouts)
         self.hide_all(self.ui.ShipGridLayout)
-        self.init_ShipGrid(grid_parse)
+        validShip = self.init_ShipGrid(grid_parse)
         num_used_cells = self.grid_display.get_num_used_cells()
         self.log_open_manifest(num_used_cells, current_time())
         self.display_parse_results(num_used_cells)
         self.show_all(self.ui.ShipGridLayout)
+        if validShip == False:
+            self.invalid_ship()
+
+        return validShip
 
     @QtCore.Slot(object)
     def solution_found(self, solution):
         self.solutionStates = solution.get_states()
         self.solutionActions = solution.get_actions()
         self.solutionIdx = 0 
+        if len(self.solutionActions) > 0:
+            self.log_solution_metrics(solution)
         self.display_solution()
         self.show_all(self.ui.MessageLayouts)
 
@@ -154,31 +164,39 @@ class Components(QtCore.QObject):
             self.throw_error("There was an issue opening the log file.")
 
     def log_open_manifest(self, numItems:int, currTime=current_time()):
-        output = parse_time(currTime) + f"Manifest {self.file_root_name}.txt is opened, there are {numItems} containers on the ship.\n"
+        output = parse_time(currTime) + f"Manifest {self.file_root_name}.txt is opened, there {quantify(numItems)} container(s) on the ship.\n"
         self.log_line(output)
 
     def log_solution_metrics(self, sol:Solution, currTime=current_time()):
-        output = parse_time(currTime) + f"Balance solution found, it will require {len(sol.get_actions())} moves/{sol.get_time_to_execute()} minutes.\n"
+        output = parse_time(currTime) + f"Balance solution found, it will require {len(sol.get_actions())} actions/{sol.get_time_to_execute()} minutes.\n"
         self.log_line(output)
     
-    def log_move(self, action:Action, currTime=current_time()):
+    def log_move(self, action:Action, actionType:ActionTypes, currTime=current_time()):
+        if actionType is None or actionType != ActionTypes.MoveItem:
+            return
         output = parse_time(currTime) + f"{action.source.coordinate} was moved to {action.target.coordinate}.\n"
+        self.log_line(output)
+
+    def log_no_moves_needed(self, currTime=current_time()):
+        output = parse_time(currTime) + f"There are no moves needed for Manifest {self.file_root_name}.txt Operator has been notified. {self.outbound_file_name} has been written to desktop.\n"
         self.log_line(output)
  
     def log_comment(self, currTime=current_time()):
         comment = self.ui.CommentInput.toPlainText()
+        print(f"\"{comment}\"")
         if comment is None or comment == "":
             self.set_page(Pages.ShipGridPage)
-        output = parse_time(currTime) + f"{comment}\n"
+            return
+        output = parse_time(current_time()) + f"{comment}\n"
         self.log_line(output)
         self.set_page(Pages.ShipGridPage)
 
     def log_completed_cycle(self, currTime=current_time()):
-        output = parse_time(currTime) + f"Finished a Cycle. Manifest {self.outbound_file_name} was written to desktop, and a reminder pop-up to operator to send file was displayed."
+        output = parse_time(currTime) + f"Finished a Cycle. Manifest {self.outbound_file_name} was written to desktop, and a reminder pop-up to operator to send file was displayed.\n"
         self.log_line(output)
 
     def log_exit_app(self, currTime=current_time()):
-        output = parse_time(currTime) + f"Program was shut down."
+        output = parse_time(currTime) + f"Program was shut down.\n"
         self.log_line(output)
 
     # TODO: allow scroll in history
@@ -190,10 +208,11 @@ class Components(QtCore.QObject):
         message = f"{idx+1} of {len(actions)}: Move "
 
         if len(actions) == 0: # no moves needed
-            self.display_no_moves_needed()
+            self.display_no_moves_needed(states[idx])
+            return
         
         if self.lastAction is not None:
-            self.log_move(self.lastAction)
+            self.log_move(self.lastAction, self.lastActionType)
             self.update_outbound_file(states[idx]) # will reach >= actions before >= states
 
         if self.solutionIdx >= len(actions): # end reached
@@ -222,11 +241,14 @@ class Components(QtCore.QObject):
             
             self.lastMove = message
             self.lastAction = action
+            self.lastActionType = actionType
             self.solutionIdx += 1
             self.ui.MessageLhsLabel.setText(message)
             self.grid_display.update(state, action)
 
-    def display_no_moves_needed(self):
+    def display_no_moves_needed(self, state:State):
+        self.log_no_moves_needed()
+        self.update_outbound_file(state)
         self.throw_error("No moves needed! Crate layout already meets criteria.")
 
     def end_reached(self):
@@ -234,8 +256,6 @@ class Components(QtCore.QObject):
         self.solutionStates = None
         self.solutionActions = None
         self.currentMove = None
-        self.reset_grid_display()
-        self.reset_previous_moves()
         self.log_completed_cycle()
         self.to_success_page()
 
@@ -291,8 +311,12 @@ class Components(QtCore.QObject):
         self.ui.ErrorLabel.setText(errorMsg)
         self.ui.ErrorLabel.setStyleSheet("color:red")
     
-    # TODO: get program start time for log
     def restart(self):
+        self.lastAction = None
+        self.lastMove = None
+        self.lastActionType = None
+        self.reset_grid_display()
+        self.reset_previous_moves()
         self.set_page(Pages.FilePickPage)
 
     def init_ShipGrid(self, grid_parse: list[ManifestItem]):
@@ -303,10 +327,19 @@ class Components(QtCore.QObject):
             for cell in cell_row:
                 self.ui.ShipGrid.addWidget(cell.label, cell.get_display_row(), cell.get_display_col())
         
-        if not initial_state_grid_display.valid_grid():
-            self.throw_error("ERROR: Ship layout is not allowed (asymmetric or floating objects)! Try again with a new file.")
-
         self.grid_display = initial_state_grid_display
+
+        if not initial_state_grid_display.valid_grid():
+            return False
+        return True
+
+    def invalid_ship(self):
+        self.throw_error("ERROR: Ship layout is not allowed (asymmetric or floating objects)! Try again with a new file.")
+        self.log_invalid_ship()
+    
+    def log_invalid_ship(self, currTime=current_time()):
+        output = parse_time(currTime) + f"Manifest {self.file_root_name}.txt contained an invalid ship grid. Operator has been notified.\n"
+        self.log_line(output)
 
     def display_parse_results(self, num_used_cells: int):
         root_name = self.file_root_name
