@@ -107,9 +107,9 @@ class Node:
     
     def is_goal_state(self) -> bool:
         criteria_b = self.get_state().meets_criteria_b()
-        crane_parked = self.get_state().get_crane() == Coordinate(9,1)
+        # crane_parked = self.get_state().get_crane() == Coordinate(9,1)
 
-        return criteria_b and crane_parked
+        return (self.state.meets_criteria_a() or self.state.meets_criteria_b())
     
     def meets_criteria_b(self) -> bool:
         return self.get_state().meets_criteria_b()

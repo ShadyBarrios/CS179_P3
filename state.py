@@ -84,20 +84,15 @@ class State:
         
         return port_side, starboard_side
 
-    # Get columns of weights for a specific grid
-    def _get_weight_list(grid: list[list[ManifestItem]]) -> list[list[int]]:
+    # Get list of all weights in grid
+    def get_weight_list(self) -> list[int]:
         weights = []
-        row_count = len(grid)
-        col_count = len(grid[0])
 
-        for col in range(col_count):
-            col_weights = []
-            for row in range(row_count):
-                item = grid[row][col]
+        for row in range(self.row_count):
+            for col in range(self.col_count):
+                item = self.grid[row][col]
                 if CellTypes.to_type(item.get_title()) == CellTypes.USED:
-                    col_weights.append(item.get_weight())
-            if len(col_weights) > 0:
-                weights.append(col_weights)
+                    weights.append(item.get_weight())
 
         return weights
     
@@ -380,6 +375,32 @@ class State:
 
         return result
 
+    def calculate_criteria_a(self) -> int:
+        # Ref: https://www.geeksforgeeks.org/dsa/partition-a-set-into-two-subsets-such-that-the-difference-of-subset-sums-is-minimum/
+        weight_list = self.get_weight_list()
+        total_weight = sum(weight_list)
+        target_weight = total_weight // 2
+
+        dp = [[False for _ in range(total_weight+1)] for _ in range(len(weight_list)+1)]
+
+        dp[0][0] = True
+
+        for i in range(1, len(weight_list)+1):
+            for sum_value in range(total_weight+1):
+                # skip
+                dp[i][sum_value] = dp[i-1][sum_value]
+
+                if sum_value >= weight_list[i-1]:
+                    dp[i][sum_value] = dp[i][sum_value] or dp[i-1][sum_value - weight_list[i-1]]
+        
+        res = float('inf')
+
+        for sum_val in range(target_weight+1):
+            if dp[len(weight_list)][sum_val]:
+                res = min(res, abs(target_weight - sum_val) - sum_val)
+        
+        return res
+
     def calculate_criteria_b(self) -> float:
         port_side_weight, starboard_side_weight = self.get_side_weights()
 
@@ -387,6 +408,10 @@ class State:
         total_weight = port_side_weight + starboard_side_weight
         return side_diff - (total_weight * 0.1)
     
+    def meets_criteria_a(self) -> bool:
+        port_weight, starboard_weight = self.get_side_weights()
+        return abs(port_weight - starboard_weight) == self.calculate_criteria_a()
+
     # criteria b: |Ph - Sh| <= (Sum(Po, So) * 0.10) therefore |Ph - Sh| - (sum(Po, So) * 10) <= 0
     def meets_criteria_b(self) -> bool:
         return (self.calculate_criteria_b() < 0)
