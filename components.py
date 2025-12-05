@@ -114,7 +114,7 @@ class Components(QtCore.QObject):
                 case ParseErrorTypes.IncorrectManifestLength:
                     self.throw_error("Error: Manifest does not match expected length (n = 96). Try again.")
                     return None
-        
+                
         self.src_file_name = file_name
         self.file_root_name = get_file_root_name(file_name)
         self.outbound_file_name = self.file_root_name + "OUTBOUND" + ".txt"
@@ -362,7 +362,7 @@ class Components(QtCore.QObject):
         return True
 
     def invalid_ship(self):
-        self.throw_error("ERROR: Ship layout is not allowed (asymmetric, floating objects, or too many crates)! Try again with a new file.")
+        self.throw_error("ERROR: Ship layout is not allowed (asymmetric, floating objects, ghost weights, or too many crates)! Try again with a new file.")
         self.log_invalid_ship()
     
     def log_invalid_ship(self):

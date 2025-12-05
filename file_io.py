@@ -16,7 +16,7 @@ def parse_file(file_name) -> list[ManifestItem] | ParseErrorTypes:
     # explanation of regex match criteria
     # one [ followed by 01 through 08 followed by , followed by 01 through 12 followed by one ]
     # followed by one , and one space
-    # followed by one { followed by five 0 through 9 followed by one }
+    # followed by one { followed by five 0 through 9 followed by one }, if UNUSED or NAN, must be 5 zeros
     # followed by one , and one space
     # followed by any number of characters that contain at least one lowercase/capital letter
     expected_format = "\[0[1-8],(0[1-9]|1[0-2])\],\s\{[0-9]{5}\},\s.*[a-zA-Z]+.*"
@@ -67,6 +67,7 @@ def parse_file(file_name) -> list[ManifestItem] | ParseErrorTypes:
                     weight = int(re.findall(weight_format, weight_str)[0])
 
                     title = title_str.strip()
+                    
                     items.append(ManifestItem(coordinate, weight, title))
                     item_count += 1
                 else:
