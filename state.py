@@ -35,9 +35,6 @@ class State:
         crane_copy = self.crane.copy()
         return State(grid_copy, crane_copy)
     
-    # def copy_with_new_crane(self, crane:Coordinate):
-    #     return State(self._copy_grid(), crane.copy())
-    
     def get_crane(self) -> Coordinate:
         return self.crane
     
@@ -374,45 +371,3 @@ class State:
                     break
 
         return result
-
-    def calculate_criteria_a(self) -> int:
-        # Ref: https://www.geeksforgeeks.org/dsa/partition-a-set-into-two-subsets-such-that-the-difference-of-subset-sums-is-minimum/
-        weight_list = self.get_weight_list()
-        total_weight = sum(weight_list)
-        target_weight = total_weight // 2
-
-        dp = [[False for _ in range(total_weight+1)] for _ in range(len(weight_list)+1)]
-
-        dp[0][0] = True
-
-        for i in range(1, len(weight_list)+1):
-            for sum_value in range(total_weight+1):
-                # skip
-                dp[i][sum_value] = dp[i-1][sum_value]
-
-                if sum_value >= weight_list[i-1]:
-                    dp[i][sum_value] = dp[i][sum_value] or dp[i-1][sum_value - weight_list[i-1]]
-        
-        res = float('inf')
-
-        for sum_val in range(target_weight+1):
-            if dp[len(weight_list)][sum_val]:
-                res = min(res, abs(total_weight - sum_val) - sum_val)
-        
-        return res
-
-    def calculate_criteria_b(self) -> float:
-        port_side_weight, starboard_side_weight = self.get_side_weights()
-
-        side_diff = abs(port_side_weight - starboard_side_weight)
-        total_weight = port_side_weight + starboard_side_weight
-        return side_diff - (total_weight * 0.1)
-    
-    def meets_criteria_a(self) -> bool:
-        port_weight, starboard_weight = self.get_side_weights()
-        return abs(port_weight - starboard_weight) == self.calculate_criteria_a()
-
-    # criteria b: |Ph - Sh| <= (Sum(Po, So) * 0.10) therefore |Ph - Sh| - (sum(Po, So) * 10) <= 0
-    def meets_criteria_b(self) -> bool:
-        return (self.calculate_criteria_b() < 0)
-
