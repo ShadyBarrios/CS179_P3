@@ -397,7 +397,7 @@ class State:
 
         for sum_val in range(target_weight+1):
             if dp[len(weight_list)][sum_val]:
-                res = min(res, abs(target_weight - sum_val) - sum_val)
+                res = min(res, abs(total_weight - sum_val) - sum_val)
         
         return res
 
