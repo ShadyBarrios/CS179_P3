@@ -90,3 +90,4 @@ examples/
 tests/
 output/
 test_empty/
+log_backup/
