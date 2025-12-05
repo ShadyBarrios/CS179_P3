@@ -30,7 +30,8 @@ class Node:
         return (comp_states and comp_actions)
     
     def __hash__(self) -> int:
-        return hash((self.state, self.action_type))
+        actionType = ActionTypes.ToItem if (self.action_type == ActionTypes.FromPark or self.action_type == ActionTypes.ToPark) else self.action_type
+        return hash((self.state, actionType))
     
     def __lt__(self, rhs):
         if not(isinstance(rhs, Node)):

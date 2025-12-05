@@ -125,6 +125,7 @@ class Components(QtCore.QObject):
             return None
 
     def begin(self, grid_parse: list[ManifestItem]) :
+        self.remove_solution_metadata()
         self.set_page(Pages.ShipGridPage)
         self.hide_all(self.ui.MessageLayouts)
         self.hide_all(self.ui.ShipGridLayout)
@@ -144,7 +145,6 @@ class Components(QtCore.QObject):
         self.solutionStates = solution.get_states()
         self.solutionActions = solution.get_actions()
         self.solutionIdx = 0 
-
         if len(self.solutionActions) > 0:
             self.log_solution_metrics(solution)
             self.display_solution_metadata(len(self.solutionActions), solution.get_time_to_execute())

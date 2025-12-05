@@ -40,7 +40,7 @@ def create_grid_from_list(item_list: list[ManifestItem], row_count: int = 8, col
 # think of it as FSM where source moves to target
 def manhattan_dist(grid: list[list[ManifestItem]], curr_row: int, curr_col: int, target_row: int, target_col: int, actionType:ActionTypes):    
     dist = 0 
-    # crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
+    crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
     # print(f"{crane_move} for {curr_row},{curr_col} to {target_row},{target_col}")
     while True:
         match(crane_move):

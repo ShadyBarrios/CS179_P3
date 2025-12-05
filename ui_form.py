@@ -69,7 +69,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayoutWidget_3 = QWidget(self.ShipGridPage)
         self.horizontalLayoutWidget_3.setObjectName(u"horizontalLayoutWidget_3")
-        self.horizontalLayoutWidget_3.setGeometry(QRect(30, 10, 871, 178))
+        self.horizontalLayoutWidget_3.setGeometry(QRect(30, 10, 871, 171))
         self.MessageLayouts = QHBoxLayout(self.horizontalLayoutWidget_3)
         self.MessageLayouts.setObjectName(u"MessageLayouts")
         self.MessageLayouts.setContentsMargins(0, 0, 0, 0)
@@ -188,7 +188,7 @@ class Ui_MainWindow(object):
         self.PreviousMovesScrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 425, 148))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 425, 141))
         self.PreviousMovesLabel = QLabel(self.scrollAreaWidgetContents)
         self.PreviousMovesLabel.setObjectName(u"PreviousMovesLabel")
         self.PreviousMovesLabel.setGeometry(QRect(10, 10, 411, 131))
