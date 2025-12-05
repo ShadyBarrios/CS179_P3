@@ -12,12 +12,12 @@ from coordinate import Coordinate
 # ItemPosition.STARBOARD: "background-color:GRAY; color:GRAY;"
 
 global_stylesheet = """
-QLabel[cls="NAN"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:BLACK; color:BLACK; }
-QLabel[cls="USED"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(255, 165, 0, 0.5); color:BLACK; }
-QLabel[cls="TARGET"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(255, 0, 0, 0.5); color:BLACK; }
-QLabel[cls="SOURCE"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(60, 179, 133, 0.5); color:BLACK; }
-QLabel[cls="PORT"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black;background-color:WHITE; color:WHITE; }
-QLabel[cls="STARBOARD"] { padding-top:18px; padding-bottom:18px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:GRAY; color:GRAY; }
+QLabel[cls="NAN"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:BLACK; color:BLACK; }
+QLabel[cls="USED"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(255, 165, 0, 0.5); color:BLACK; }
+QLabel[cls="TARGET"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(255, 0, 0, 0.5); color:BLACK; }
+QLabel[cls="SOURCE"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:rgba(60, 179, 133, 0.5); color:BLACK; }
+QLabel[cls="PORT"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black;background-color:WHITE; color:WHITE; }
+QLabel[cls="STARBOARD"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:GRAY; color:GRAY; }
 QLabel[cls="PARK"] { border: 2px solid black; background-color:GRAY; color:GRAY; }
 """
 
@@ -54,8 +54,10 @@ class Cell:
     def _set_label_text(self):
         if self.item.title == "UNUSED" or self.item.title == "NAN":
             self.label.setText("UNUSED")
+        elif len(self.item.title) > 6:
+            self.label.setText(f"{self.item.title[:5]}...<br>{self.item.weight}")
         else:
-            self.label.setText(str(self.item.weight))
+            self.label.setText(f"{self.item.title}<br>{self.item.weight}")
         
         # if self.item.title == "UNUSED" or self.item.title == "NAN":
         #     self.label.setText("UNUSED")
