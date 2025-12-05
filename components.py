@@ -130,7 +130,7 @@ class Components(QtCore.QObject):
         validShip = self.init_ShipGrid(grid_parse)
         num_used_cells = self.grid_display.get_num_used_cells()
         validShip = validShip and num_used_cells <= 16
-        self.log_open_manifest(num_used_cells, current_time())
+        self.log_open_manifest(num_used_cells)
         self.display_parse_results(num_used_cells)
         self.show_all(self.ui.ShipGridLayout)
         if validShip == False:
@@ -164,39 +164,45 @@ class Components(QtCore.QObject):
         except FileNotFoundError:
             self.throw_error("There was an issue opening the log file.")
 
-    def log_open_manifest(self, numItems:int, currTime=current_time()):
+    def log_open_manifest(self, numItems:int):
+        currTime=current_time()
         output = parse_time(currTime) + f"Manifest {self.file_root_name}.txt is opened, there {quantify(numItems)} container(s) on the ship.\n"
         self.log_line(output)
 
-    def log_solution_metrics(self, sol:Solution, currTime=current_time()):
+    def log_solution_metrics(self, sol:Solution):
+        currTime=current_time()
         output = parse_time(currTime) + f"Balance solution found, it will require {len(sol.get_actions())} actions/{sol.get_time_to_execute()} minutes.\n"
         self.log_line(output)
     
-    def log_move(self, action:Action, actionType:ActionTypes, currTime=current_time()):
+    def log_move(self, action:Action, actionType:ActionTypes):
+        currTime=current_time()
         if actionType is None or actionType != ActionTypes.MoveItem:
             return
         output = parse_time(currTime) + f"{action.source.coordinate} was moved to {action.target.coordinate}.\n"
         self.log_line(output)
 
-    def log_no_moves_needed(self, currTime=current_time()):
+    def log_no_moves_needed(self):
+        currTime=current_time()
         output = parse_time(currTime) + f"There are no moves needed for Manifest {self.file_root_name}.txt Operator has been notified. {self.outbound_file_name} has been written to desktop.\n"
         self.log_line(output)
  
-    def log_comment(self, currTime=current_time()):
+    def log_comment(self):
         comment = self.ui.CommentInput.toPlainText()
-        print(f"\"{comment}\"")
+        currTime=current_time()
         if comment is None or comment == "":
             self.set_page(Pages.ShipGridPage)
             return
-        output = parse_time(current_time()) + f"{comment}\n"
+        output = parse_time(currTime) + f"{comment}\n"
         self.log_line(output)
         self.set_page(Pages.ShipGridPage)
 
-    def log_completed_cycle(self, currTime=current_time()):
+    def log_completed_cycle(self):
+        currTime=current_time()
         output = parse_time(currTime) + f"Finished a Cycle. Manifest {self.outbound_file_name} was written to desktop, and a reminder pop-up to operator to send file was displayed.\n"
         self.log_line(output)
 
-    def log_exit_app(self, currTime=current_time()):
+    def log_exit_app(self):
+        currTime=current_time()
         output = parse_time(currTime) + f"Program was shut down.\n"
         self.log_line(output)
 
@@ -338,7 +344,8 @@ class Components(QtCore.QObject):
         self.throw_error("ERROR: Ship layout is not allowed (asymmetric, floating objects, or too many crates)! Try again with a new file.")
         self.log_invalid_ship()
     
-    def log_invalid_ship(self, currTime=current_time()):
+    def log_invalid_ship(self):
+        currTime=current_time()
         output = parse_time(currTime) + f"Manifest {self.file_root_name}.txt contained an invalid ship grid. Operator has been notified.\n"
         self.log_line(output)
 
