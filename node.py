@@ -62,11 +62,11 @@ class Node:
                 return ActionTypes.MoveItem
             case ActionTypes.MoveItem:
                 return ActionTypes.ToItem
-            
-    
-    def get_weights(self) -> tuple[int, int]:
-        return self.state.get_side_weights()
 
+    def get_weight_diff(self) -> int:
+        port_side_weight, starboard_side_weight = self.state.get_side_weights()
+        return abs(port_side_weight - starboard_side_weight)
+    
     # f(n) = g(n) + h(n)
     def get_total_cost(self) -> float:
         return self.cost + self.heuristic
@@ -81,7 +81,7 @@ class Node:
         return self.heuristic
 
     def get_parent(self):
-        parent:Node = self.parent
+        parent: Node = self.parent
         return parent
 
     def get_state(self) -> State:
@@ -105,23 +105,47 @@ class Node:
             children.append(node)
         return children
     
-    def is_goal_state(self) -> bool:
-        criteria_b = self.get_state().meets_criteria_b()
-        crane_parked = self.get_state().get_crane() == Coordinate(9,1)
+    # criteria a: weight difference between sides is minimized
+    def calculate_criteria_a(self) -> int:
+        # Ref: https://www.geeksforgeeks.org/dsa/partition-a-set-into-two-subsets-such-that-the-difference-of-subset-sums-is-minimum/
+        weight_list = self.state.get_weight_list()
+        total_weight = sum(weight_list)
+        target_weight = total_weight // 2
 
-        return criteria_b and crane_parked
+        dp = [[False for _ in range(total_weight+1)] for _ in range(len(weight_list)+1)]
+
+        dp[0][0] = True
+
+        for i in range(1, len(weight_list)+1):
+            for sum_value in range(total_weight+1):
+                # skip
+                dp[i][sum_value] = dp[i-1][sum_value]
+
+                if sum_value >= weight_list[i-1]:
+                    dp[i][sum_value] = dp[i][sum_value] or dp[i-1][sum_value - weight_list[i-1]]
+        
+        res = float('inf')
+
+        for sum_val in range(target_weight+1):
+            if dp[len(weight_list)][sum_val]:
+                res = min(res, abs(total_weight - sum_val) - sum_val)
+        
+        return res
+    
+    # criteria b: |Ph - Sh| <= (Sum(Po, So) * 0.10) therefore |Ph - Sh| - (sum(Po, So) * 10) <= 0
+    def calculate_criteria_b(self) -> float:
+        port_side_weight, starboard_side_weight = self.state.get_side_weights()
+
+        side_diff = abs(port_side_weight - starboard_side_weight)
+        total_weight = port_side_weight + starboard_side_weight
+        return side_diff - (total_weight * 0.1)
     
     def meets_criteria_b(self) -> bool:
-        return self.get_state().meets_criteria_b()
-    
-    def get_weight_diff(self) -> int:
-        port_side_weight, starboard_side_weight = self.get_state().get_side_weights()
-        return abs(port_side_weight - starboard_side_weight)
-    
+        return self.calculate_criteria_b() < 0
+
     def manhattan_dist(self) -> int:
         action = self.get_action()
-        state = self.get_state()
-        grid = state.get_grid()
+        grid = self.state.get_grid()
 
         # - 1 for idx
         curr_row = action.source.get_row() - 1
@@ -132,8 +156,3 @@ class Node:
         dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col)
         return dist
     
-    # def to_park(self):
-    #     state = self.get_state()
-    #     cost = manhattan_dist(state.get_grid())
-    #     to_park = Node(state.get_grid(), )
-    #     pass

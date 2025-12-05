@@ -35,9 +35,6 @@ class State:
         crane_copy = self.crane.copy()
         return State(grid_copy, crane_copy)
     
-    # def copy_with_new_crane(self, crane:Coordinate):
-    #     return State(self._copy_grid(), crane.copy())
-    
     def get_crane(self) -> Coordinate:
         return self.crane
     
@@ -84,20 +81,15 @@ class State:
         
         return port_side, starboard_side
 
-    # Get columns of weights for a specific grid
-    def _get_weight_list(grid: list[list[ManifestItem]]) -> list[list[int]]:
+    # Get list of all weights in grid
+    def get_weight_list(self) -> list[int]:
         weights = []
-        row_count = len(grid)
-        col_count = len(grid[0])
 
-        for col in range(col_count):
-            col_weights = []
-            for row in range(row_count):
-                item = grid[row][col]
+        for row in range(self.row_count):
+            for col in range(self.col_count):
+                item = self.grid[row][col]
                 if CellTypes.to_type(item.get_title()) == CellTypes.USED:
-                    col_weights.append(item.get_weight())
-            if len(col_weights) > 0:
-                weights.append(col_weights)
+                    weights.append(item.get_weight())
 
         return weights
     
@@ -379,15 +371,3 @@ class State:
                     break
 
         return result
-
-    def calculate_criteria_b(self) -> float:
-        port_side_weight, starboard_side_weight = self.get_side_weights()
-
-        side_diff = abs(port_side_weight - starboard_side_weight)
-        total_weight = port_side_weight + starboard_side_weight
-        return side_diff - (total_weight * 0.1)
-    
-    # criteria b: |Ph - Sh| <= (Sum(Po, So) * 0.10) therefore |Ph - Sh| - (sum(Po, So) * 10) <= 0
-    def meets_criteria_b(self) -> bool:
-        return (self.calculate_criteria_b() < 0)
-
