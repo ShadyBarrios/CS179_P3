@@ -83,10 +83,20 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.MessageLhsLayout = QHBoxLayout()
         self.MessageLhsLayout.setObjectName(u"MessageLhsLayout")
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.SolutionMetadataLabel = QLabel(self.horizontalLayoutWidget_3)
+        self.SolutionMetadataLabel.setObjectName(u"SolutionMetadataLabel")
+
+        self.verticalLayout.addWidget(self.SolutionMetadataLabel)
+
         self.MessageLhsLabel = QLabel(self.horizontalLayoutWidget_3)
         self.MessageLhsLabel.setObjectName(u"MessageLhsLabel")
 
-        self.MessageLhsLayout.addWidget(self.MessageLhsLabel)
+        self.verticalLayout.addWidget(self.MessageLhsLabel)
+
+
+        self.MessageLhsLayout.addLayout(self.verticalLayout)
 
         self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -381,7 +391,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.AllPages.setCurrentIndex(2)
+        self.AllPages.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -389,7 +399,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Keogh's Port App by CyberSmiths", None))
-        self.MessageLhsLabel.setText(QCoreApplication.translate("MainWindow", u"LHS Message", None))
+        self.SolutionMetadataLabel.setText("")
+        self.MessageLhsLabel.setText("")
         self.ParkLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.ContinueButton.setText(QCoreApplication.translate("MainWindow", u"Continue", None))
         self.WhenDoneLabel.setText(QCoreApplication.translate("MainWindow", u"when done", None))

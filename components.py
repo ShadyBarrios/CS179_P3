@@ -143,11 +143,19 @@ class Components(QtCore.QObject):
         self.solutionStates = solution.get_states()
         self.solutionActions = solution.get_actions()
         self.solutionIdx = 0 
+
         if len(self.solutionActions) > 0:
             self.log_solution_metrics(solution)
+            self.display_solution_metadata(len(self.solutionActions), solution.get_time_to_execute())
         self.display_solution()
         self.show_all(self.ui.MessageLayouts)
+    
+    def display_solution_metadata(self, numActions:int, duration:int):
+        self.ui.SolutionMetadataLabel.setText(f"Solution contains {numActions} moves and takes {duration} minutes to execute")
 
+    def remove_solution_metadata(self):
+        self.ui.SolutionMetadataLabel.setText("")
+        
     def start_log(self):
         makedir(self.directory, exist_ok=True)
 
@@ -206,7 +214,6 @@ class Components(QtCore.QObject):
         output = parse_time(currTime) + f"Program was shut down.\n"
         self.log_line(output)
 
-    # TODO: allow scroll in history
     def display_solution(self):
         idx = self.solutionIdx
         states:list[State] = self.solutionStates
