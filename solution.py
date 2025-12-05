@@ -29,6 +29,15 @@ class Solution:
         states.reverse()
         return states
     
+    def get_nodes(self) -> list[Node]:
+        current_node = self.goal_node
+        nodes = []
+        while current_node is not None:
+            nodes.append(current_node)
+            current_node = current_node.parent
+        nodes.reverse()
+        return nodes
+    
     def get_time_to_execute(self) -> int:
         return self.goal_node.get_cost()
     

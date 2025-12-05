@@ -130,7 +130,7 @@
         <x>30</x>
         <y>10</y>
         <width>871</width>
-        <height>178</height>
+        <height>171</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="MessageLayouts">
@@ -313,7 +313,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>425</width>
-                <height>148</height>
+                <height>141</height>
                </rect>
               </property>
               <widget class="QLabel" name="PreviousMovesLabel">

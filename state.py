@@ -139,7 +139,7 @@ class State:
                 item_below_type = CellTypes.USED if row == 0 else CellTypes.to_type(self.grid[row-1][col].get_title())
                 if item_type == CellTypes.UNUSED and item_below_type != CellTypes.UNUSED:
                     open_spots.append(item)
-
+        # print([str(item.coordinate) for item in open_spots])
         return open_spots
     
     def get_moveable_items(self) -> list[ManifestItem]:
@@ -202,8 +202,9 @@ class State:
         if not isinstance(rhs, State):
             return False
         column_equality = self.__compare_weight_columns__(rhs)
-        crane_equality = self.__compare_cranes__(rhs)
-        return column_equality and crane_equality
+        # crane_equality = self.__compare_cranes__(rhs)
+        # return column_equality and crane_equality
+        return column_equality
     
     def __hash__(self) -> int:
         port_weights, starboard_weights = self.get_side_weight_lists()
@@ -216,7 +217,7 @@ class State:
         port_weights_final = tuple(port_weights_sorted)
         starboard_weights_final = tuple(starboard_weights_sorted)
 
-        return hash((port_weights_final, starboard_weights_final, self.crane))
+        return hash((port_weights_final, starboard_weights_final))
 
     # compares to see that both grids have the same weight columns on the same sides (or mirrored)
     def __compare_weight_columns__(self, rhs) -> bool:
@@ -315,7 +316,6 @@ class State:
             case ActionTypes.MoveItem:
                 source_coordinate = action.source.get_coordinate().copy()
 
-
                 source = new_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1].copy()
                 source.set_coordinate(target_coordinate)
 
@@ -324,7 +324,7 @@ class State:
 
                 # update old source coordinate with empty object
                 new_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
-        
+                
                 return State(new_grid, target_coordinate)
             case ActionTypes.ToPark:
                 return State(new_grid, target_coordinate)
