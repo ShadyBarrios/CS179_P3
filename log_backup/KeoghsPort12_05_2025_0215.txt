@@ -1,0 +1,9 @@
+12 05 2025: 02:15 Program was started.
+12 05 2025: 02:15 Manifest EmptyShip4.txt is opened, there are 0 container(s) on the ship.
+12 05 2025: 02:15 Manifest EmptyShip4.txt contained an invalid ship grid. Operator has been notified.
+12 05 2025: 02:15 Manifest EmptyShip2.txt is opened, there are 0 container(s) on the ship.
+12 05 2025: 02:15 Manifest EmptyShip2.txt contained an invalid ship grid. Operator has been notified.
+12 05 2025: 02:15 Manifest ShipCase1.txt is opened, there are 0 container(s) on the ship.
+12 05 2025: 02:15 There are no moves needed for Manifest ShipCase1.txt Operator has been notified. ShipCase1OUTBOUND.txt has been written to desktop.
+12 05 2025: 02:16 Program was shut down.
+12 05 2025: 02:16 Log file stored for redundancy to log_backup directory.

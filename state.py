@@ -185,8 +185,17 @@ class State:
 
     # will check if layout is legal (no floating cells and must be symmetric)
     def valid_grid(self) -> bool:
-        return self.is_symmetric() and self.is_physically_possible()
+        return self.is_symmetric() and self.is_physically_possible() and self.contains_no_ghost_weights()
     
+    # any cells that are NAN or UNUSED yet have weights attached
+    def contains_no_ghost_weights(self) -> bool:
+        for row in self.grid:
+            for item in row:
+                if (item.get_title() == "UNUSED" or item.get_title()) == "NAN" and item.get_weight() > 0:
+                    return False
+        
+        return True
+
     # in order for two grid to be not "equal"
     # they cannot have the same moveable objects in addition to the same objects on the same sides
     # they can also mirror each other

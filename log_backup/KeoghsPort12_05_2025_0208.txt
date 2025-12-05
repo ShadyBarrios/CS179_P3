@@ -1,0 +1,3 @@
+12 05 2025: 02:08 Program was started.
+12 05 2025: 02:09 Program was shut down.
+12 05 2025: 02:09 Log file stored for redundancy to log_backup directory.

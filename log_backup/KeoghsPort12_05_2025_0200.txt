@@ -1,0 +1,5 @@
+12 05 2025: 02:00 Program was started.
+12 05 2025: 02:00 Manifest ShipCase2.txt is opened, there are 0 container(s) on the ship.
+12 05 2025: 02:00 There are no moves needed for Manifest ShipCase2.txt Operator has been notified. ShipCase2OUTBOUND.txt has been written to desktop.
+12 05 2025: 02:00 Program was shut down.
+12 05 2025: 02:00 Log file stored for redundancy to log_backup directory.
