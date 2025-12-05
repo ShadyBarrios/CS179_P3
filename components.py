@@ -4,6 +4,7 @@ from grid_display import GridDisplay
 from enum import Enum
 from file_io import ParseErrorTypes, parse_file
 from state import State
+from node import Node
 from solution import Solution
 from search import Search
 from PySide6 import QtCore
@@ -142,6 +143,7 @@ class Components(QtCore.QObject):
 
     @QtCore.Slot(object)
     def solution_found(self, solution):
+        self.solutionNodes = solution.get_nodes()
         self.solutionStates = solution.get_states()
         self.solutionActions = solution.get_actions()
         self.solutionIdx = 0 
@@ -230,6 +232,7 @@ class Components(QtCore.QObject):
 
     def display_solution(self):
         idx = self.solutionIdx
+        nodes:list[Node] = self.solutionNodes
         states:list[State] = self.solutionStates
         actions:list[Action] = self.solutionActions
         park = Coordinate(9,1)
@@ -246,6 +249,7 @@ class Components(QtCore.QObject):
         if self.solutionIdx >= len(actions): # end reached
             self.end_reached()
         else:
+            dist = nodes[idx+1].dist # node[0] is the initial state, no calculation
             state = states[idx]
             action = actions[idx]
             
@@ -254,7 +258,7 @@ class Components(QtCore.QObject):
             elif action.target.coordinate == park:
                 actionType = ActionTypes.ToPark
             else:
-                actionType = ActionTypes.MoveItem
+                actionType = nodes[idx+1].action_type # node[0] is the initial state, no calculation
 
             if self.lastMove is not None:
                 self.add_to_moves(self.lastMove)
@@ -262,11 +266,14 @@ class Components(QtCore.QObject):
             match(actionType):
                 case ActionTypes.FromPark:
                     message += f"crane from {source_styling('PARK')} to {target_styling(action.target.get_coordinate())}"
+                case ActionTypes.ToItem:
+                    message += f"crane from {source_styling(action.source.get_coordinate())} to {target_styling(action.target.get_coordinate())}"
                 case ActionTypes.ToPark:
-                    message += f"from {source_styling(action.source.get_coordinate())} to {target_styling('PARK')}"
+                    message += f"crane from {source_styling(action.source.get_coordinate())} to {target_styling('PARK')}"
                 case ActionTypes.MoveItem:
-                    message += f"from {source_styling(action.source.get_coordinate())} to {target_styling(action.target.get_coordinate())}"
+                    message += f"container in {source_styling(action.source.get_coordinate())} to {target_styling(action.target.get_coordinate())}"
             
+            message += f", {dist} minute(s)"
             self.lastMove = message
             self.lastAction = action
             self.lastActionType = actionType

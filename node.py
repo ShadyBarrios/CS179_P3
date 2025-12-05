@@ -4,11 +4,12 @@ from utils import manhattan_dist
 from coordinate import Coordinate
 
 class Node:
-    def __init__(self, state: State, cost: int=0, action: Action=None, parent=None, action_type = ActionTypes.FromPark):
+    def __init__(self, state: State, cost: int=0, dist:int=0, action: Action=None, parent=None, action_type = ActionTypes.FromPark):
         self.state = state
         self.cost = cost # g(n)
         self.heuristic = state.calculate_heuristic() # h(n)
         self.action = action
+        self.dist = dist
         self.parent = parent
         self.action_type = action_type
         self.row_count = 8
@@ -54,7 +55,7 @@ class Node:
         action = current_state.generate_actions(ActionTypes.ToPark)[0] # returns 1
         dist = self.manhattan_dist(action, ActionTypes.ToPark)
         new_state = current_state.move(action, ActionTypes.ToPark)
-        node = Node(new_state, self.cost + dist, action, parent=self, action_type=ActionTypes.ToPark)
+        node = Node(new_state, self.cost + dist, dist, action, parent=self, action_type=ActionTypes.ToPark)
         return node
 
     def next_action_type(self) -> ActionTypes:
@@ -107,7 +108,7 @@ class Node:
         for action in actions:
             dist = self.manhattan_dist(action, next_action_type)
             new_state = current_state.move(action, next_action_type)
-            node = Node(new_state, self.cost+dist, action, parent=self, action_type=next_action_type)
+            node = Node(new_state, self.cost+dist, dist, action, parent=self, action_type=next_action_type)
             children.append(node)
         return children
     
