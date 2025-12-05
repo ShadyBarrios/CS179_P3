@@ -129,6 +129,7 @@ class Components(QtCore.QObject):
         self.hide_all(self.ui.ShipGridLayout)
         validShip = self.init_ShipGrid(grid_parse)
         num_used_cells = self.grid_display.get_num_used_cells()
+        validShip = validShip and num_used_cells <= 16
         self.log_open_manifest(num_used_cells, current_time())
         self.display_parse_results(num_used_cells)
         self.show_all(self.ui.ShipGridLayout)
@@ -334,7 +335,7 @@ class Components(QtCore.QObject):
         return True
 
     def invalid_ship(self):
-        self.throw_error("ERROR: Ship layout is not allowed (asymmetric or floating objects)! Try again with a new file.")
+        self.throw_error("ERROR: Ship layout is not allowed (asymmetric, floating objects, or too many crates)! Try again with a new file.")
         self.log_invalid_ship()
     
     def log_invalid_ship(self, currTime=current_time()):
