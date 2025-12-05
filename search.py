@@ -29,7 +29,7 @@ class Search():
         while not frontier.empty():
             node: Node = frontier.get()
             
-            print(f"Chose {node.get_action()} | {node.action_type} | {node.get_weight_diff()} | {node.get_total_cost()}")
+            print(f"Chose {node.get_action()} | {node.action_type} | {node.get_weight_diff()} | {node.get_total_cost()} | {node.get_cost()} | {node.get_heuristic()}")
             
             if self._goal_test(node):
                 return Solution(node.to_park())

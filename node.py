@@ -39,6 +39,11 @@ class Node:
         
         return self.get_total_cost() < rhs.get_total_cost()
     
+    def set_state(self, state:State):
+        if not isinstance(state, State):
+            return
+        self.state = state
+
     def to_park(self):
         current_state = self.get_state()
 
@@ -46,9 +51,9 @@ class Node:
             return self
         
         action = current_state.generate_actions(ActionTypes.ToPark)[0] # returns 1
+        dist = self.manhattan_dist(action, ActionTypes.ToPark)
         new_state = current_state.move(action, ActionTypes.ToPark)
-        node = Node(new_state, self.cost, action, parent=self, action_type=ActionTypes.ToPark)
-        node.add_cost(node.manhattan_dist())
+        node = Node(new_state, self.cost + dist, action, parent=self, action_type=ActionTypes.ToPark)
         return node
 
     def next_action_type(self) -> ActionTypes:
@@ -99,9 +104,9 @@ class Node:
         next_action_type = self.next_action_type()
         actions = current_state.generate_actions(next_action_type)
         for action in actions:
+            dist = self.manhattan_dist(action, next_action_type)
             new_state = current_state.move(action, next_action_type)
-            node = Node(new_state, self.cost, action, parent=self, action_type=next_action_type)
-            node.add_cost(node.manhattan_dist())
+            node = Node(new_state, self.cost+dist, action, parent=self, action_type=next_action_type)
             children.append(node)
         return children
     
@@ -143,8 +148,7 @@ class Node:
     def meets_criteria_b(self) -> bool:
         return self.calculate_criteria_b() < 0
 
-    def manhattan_dist(self) -> int:
-        action = self.get_action()
+    def manhattan_dist(self, action:Action, actionType:ActionTypes) -> int:
         grid = self.state.get_grid()
 
         # - 1 for idx
@@ -153,6 +157,6 @@ class Node:
         target_row = action.target.get_row() - 1
         target_col = action.target.get_col() - 1
         
-        dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col)
+        dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col, actionType)
         return dist
     

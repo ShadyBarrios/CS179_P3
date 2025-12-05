@@ -139,7 +139,7 @@ class State:
                 item_below_type = CellTypes.USED if row == 0 else CellTypes.to_type(self.grid[row-1][col].get_title())
                 if item_type == CellTypes.UNUSED and item_below_type != CellTypes.UNUSED:
                     open_spots.append(item)
-
+        # print([str(item.coordinate) for item in open_spots])
         return open_spots
     
     def get_moveable_items(self) -> list[ManifestItem]:
@@ -315,7 +315,6 @@ class State:
             case ActionTypes.MoveItem:
                 source_coordinate = action.source.get_coordinate().copy()
 
-
                 source = new_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1].copy()
                 source.set_coordinate(target_coordinate)
 
@@ -324,7 +323,7 @@ class State:
 
                 # update old source coordinate with empty object
                 new_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
-        
+                
                 return State(new_grid, target_coordinate)
             case ActionTypes.ToPark:
                 return State(new_grid, target_coordinate)
