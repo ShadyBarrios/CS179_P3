@@ -11,6 +11,7 @@ from coordinate import Coordinate
 from action import Action, ActionTypes
 from time import localtime as current_time
 from os import makedirs as makedir
+from shutil import copy2
 
 class States(Enum):
     init_grid = 1
@@ -213,6 +214,19 @@ class Components(QtCore.QObject):
         currTime=current_time()
         output = parse_time(currTime) + f"Program was shut down.\n"
         self.log_line(output)
+
+        # duplicate log file into long-term storage for redundancy
+        try: 
+            backup_dir = "log_backup"
+            makedir(backup_dir, exist_ok=True)
+            
+            src = f"{self.directory}/{self.log_file_name}"
+            dest = f"{backup_dir}/{self.log_file_name}"
+            output = parse_time(current_time()) + f"Log file stored for redundancy to log_backup directory.\n"
+            self.log_line(output)
+            copy2(src, dest)
+        except FileNotFoundError:
+            self.throw_error("ERROR: Source log file could not be found and duplicated to directory \"log_backup\".")
 
     def display_solution(self):
         idx = self.solutionIdx
