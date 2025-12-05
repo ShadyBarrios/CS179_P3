@@ -256,7 +256,7 @@ class Components(QtCore.QObject):
     def display_no_moves_needed(self, state:State):
         self.log_no_moves_needed()
         self.update_outbound_file(state)
-        self.throw_error("No moves needed! Crate layout already meets criteria.")
+        self.throw_error(f"No moves needed! Crate layout already meets criteria.<br>Manifest saved to {self.outbound_file_name}")
 
     def end_reached(self):
         self.solutionIdx = 0
