@@ -191,9 +191,8 @@ class State:
     def contains_no_ghost_weights(self) -> bool:
         for row in self.grid:
             for item in row:
-                if (item.get_title() == "UNUSED" or item.get_title()) == "NAN" and item.get_weight() > 0:
+                if (item.get_title() == "UNUSED" or item.get_title() == "NAN") and item.get_weight() > 0:
                     return False
-        
         return True
 
     # in order for two grid to be not "equal"
