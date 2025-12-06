@@ -194,6 +194,9 @@ class Ui_MainWindow(object):
         self.PreviousMovesLabel.setGeometry(QRect(10, 10, 411, 131))
         sizePolicy1.setHeightForWidth(self.PreviousMovesLabel.sizePolicy().hasHeightForWidth())
         self.PreviousMovesLabel.setSizePolicy(sizePolicy1)
+        font = QFont()
+        font.setPointSize(8)
+        self.PreviousMovesLabel.setFont(font)
         self.PreviousMovesScrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.verticalLayout_5.addWidget(self.PreviousMovesScrollArea)
