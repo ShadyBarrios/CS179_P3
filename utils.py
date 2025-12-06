@@ -3,6 +3,7 @@ from manifest import ManifestItem
 from crane_moves import CraneMoves
 from pathlib import Path
 from action import ActionTypes
+from cell import CellTypes
 import time
 
 def get_all_children_items(item) -> list[QtWidgets.QWidget]:
@@ -41,6 +42,11 @@ def create_grid_from_list(item_list: list[ManifestItem], row_count: int = 8, col
 def manhattan_dist(grid: list[list[ManifestItem]], curr_row: int, curr_col: int, target_row: int, target_col: int, actionType:ActionTypes):    
     dist = 0 
     crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
+
+    # moveDownAfterMoveItem = False
+    # if curr_row != 8:
+    #     moveDownAfterMoveItem = (CellTypes.to_type(grid[curr_row][curr_col].get_title()) == CellTypes.USED) and (actionType == ActionTypes.ToItem)
+
     # print(f"{crane_move} for {curr_row},{curr_col} to {target_row},{target_col}")
     while True:
         match(crane_move):
@@ -51,6 +57,7 @@ def manhattan_dist(grid: list[list[ManifestItem]], curr_row: int, curr_col: int,
                 curr_col -= 1
             case CraneMoves.MoveDown:
                 curr_row -= 1
+                # moveDownAfterMoveItem = moveDownAfterMoveItem and True
             case CraneMoves.MoveUp:
                 curr_row += 1
             case CraneMoves.MoveUpSameRow:
@@ -61,6 +68,7 @@ def manhattan_dist(grid: list[list[ManifestItem]], curr_row: int, curr_col: int,
         dist += 1
         crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
 
+    # dist += int(moveDownAfterMoveItem) # nullified after
     dist -= int(dist > 0 and actionType != ActionTypes.MoveItem) # crane hover, so if it moves to target, then just -1
     return dist
 

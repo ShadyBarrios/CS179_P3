@@ -187,7 +187,7 @@ class Components(QtCore.QObject):
     
     def log_move(self, action:Action, actionType:ActionTypes):
         currTime=current_time()
-        if actionType is None or actionType != ActionTypes.MoveItem:
+        if actionType is None:
             return
         output = parse_time(currTime) + f"{action.source.coordinate} was moved to {action.target.coordinate}.\n"
         self.log_line(output)
