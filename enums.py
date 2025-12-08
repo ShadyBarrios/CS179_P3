@@ -29,6 +29,10 @@ class CraneMoves(Enum):
     AtDest = 5 # crane is at dest
     MoveUpSameRow = 6 # crane is on the same row as object but met an obstacle (since our algo tracks what the crane can grab, it's actually a row above curr_row, so no need to count this move)
 
+class ItemPosition(Enum):
+    PORT = 1
+    STARBOARD = 2
+
 class Pages(Enum):
     ShipGridPage = 0
     CommentPage = 1

@@ -1,8 +1,8 @@
 from PySide6 import QtWidgets, QtCore
 
 from coordinate import Coordinate
-from enums import CellTypes, TargetTypes
-from manifest import ManifestItem, ItemPosition
+from enums import CellTypes, ItemPosition, TargetTypes
+from manifest import ManifestItem
 
 global_stylesheet = """
 QLabel[cls="NAN"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:BLACK; color:BLACK; }

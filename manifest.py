@@ -1,9 +1,6 @@
 from coordinate import Coordinate
-from enums import Enum, CellTypes
+from enums import CellTypes, ItemPosition
 
-class ItemPosition(Enum):
-    PORT = 1
-    STARBOARD = 2
 
 class ManifestItem:
     def __init__(self, coordinate: Coordinate, weight: int, title: str):
