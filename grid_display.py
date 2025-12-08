@@ -1,9 +1,11 @@
-from cell import Cell, ParkCell, CellTypes, TargetTypes
+from PySide6 import QtWidgets
+
+from action import Action
+from cell import Cell, ParkCell
+from enums import ActionTypes, TargetTypes
 from manifest import ManifestItem
 from state import State
-from node import Node
-from action import Action, ActionTypes
-from PySide6 import QtWidgets
+
 
 class GridDisplay(State):
     def __init__(self, grid: list[list[ManifestItem]], parkLabel:QtWidgets.QLabel):
@@ -22,7 +24,6 @@ class GridDisplay(State):
                 cell_row.append(cell)
             self.cell_grid.append(cell_row)
         
-    
     def update(self, state:State, action:Action):
         grid = state.get_grid()
         source = action.source
@@ -35,7 +36,7 @@ class GridDisplay(State):
 
                 cell.set_item(item)
                 cell._set_label_text()
-                cell.set_type(CellTypes.to_type(item.get_title()))
+                cell.set_type(item.get_type())
                 cell.set_targetType(None)
         
         if source.coordinate == self.parkCell.coordinate:
@@ -56,5 +57,3 @@ class GridDisplay(State):
         for row in self.cell_grid:
             for cell in row:
                 cell.update_style()
-
-

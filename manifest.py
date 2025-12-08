@@ -1,9 +1,6 @@
 from coordinate import Coordinate
-from enum import Enum
+from enums import CellTypes, ItemPosition
 
-class ItemPosition(Enum):
-    PORT = 1
-    STARBOARD = 2
 
 class ManifestItem:
     def __init__(self, coordinate: Coordinate, weight: int, title: str):
@@ -12,12 +9,6 @@ class ManifestItem:
         self.title = "PARK" if self.is_park() else title
         self.position = ItemPosition.PORT if coordinate.get_col() <= 6 else ItemPosition.STARBOARD
 
-    def is_park(self) -> bool:
-        return self.coordinate == Coordinate(9,1)
-    
-    def copy(self):
-        return ManifestItem(self.coordinate.copy(), self.weight, self.title)
-    
     # only the coordinate and weight matter for matching, no difference in state if title is different
     def __eq__(self, rhs) -> int:
         if not isinstance(rhs, ManifestItem):
@@ -26,6 +17,12 @@ class ManifestItem:
     
     def __hash__(self) -> int:
         return hash((self.coordinate, self.weight))
+    
+    def is_park(self) -> bool:
+        return self.coordinate == Coordinate(9,1)
+    
+    def copy(self):
+        return ManifestItem(self.coordinate.copy(), self.weight, self.title)
 
     def get_coordinate(self) -> Coordinate:
         return self.coordinate
@@ -45,6 +42,9 @@ class ManifestItem:
     def get_position(self) -> ItemPosition:
         return self.position
 
+    def get_type(self) -> CellTypes:
+        return CellTypes.to_type(self.title)
+
     def set_coordinate(self, coordinate: Coordinate):
         self.coordinate = coordinate
 
@@ -56,6 +56,3 @@ class ManifestItem:
         same_col = self.get_coordinate().get_col() == rhs.get_coordinate().get_col()
         row_under = (self.get_coordinate().get_row() == (rhs.get_coordinate().get_row() - 1))
         return (same_col and row_under)
-    
-    def empty_item(coordinate: Coordinate):
-        return ManifestItem(coordinate, 0, "UNUSED")

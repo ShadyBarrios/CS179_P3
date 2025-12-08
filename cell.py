@@ -1,15 +1,8 @@
-from enum import Enum
 from PySide6 import QtWidgets, QtCore
-from manifest import ManifestItem, ItemPosition
-from coordinate import Coordinate
 
-# CellTypes.NAN: "background-color:BLACK; color:BLACK;",
-# CellTypes.UNUSED: "background-color:WHITE; color:WHITE;",
-# CellTypes.USED: "background-color:rgba(255, 165, 0, 0.5); color:BLACK;",
-# TargetTypes.TARGET: "background-color:rgba(255, 0, 0, 0.5); color:BLACK;",
-# TargetTypes.SOURCE: "background-color:rgba(60, 179, 133, 0.5); color:BLACK;",
-# ItemPosition.PORT: "background-color:WHITE; color:WHITE;",
-# ItemPosition.STARBOARD: "background-color:GRAY; color:GRAY;"
+from coordinate import Coordinate
+from enums import CellTypes, ItemPosition, TargetTypes
+from manifest import ManifestItem
 
 global_stylesheet = """
 QLabel[cls="NAN"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:BLACK; color:BLACK; }
@@ -21,29 +14,10 @@ QLabel[cls="STARBOARD"] { padding-top:17px; padding-bottom:17px; padding-left:10
 QLabel[cls="PARK"] { border: 2px solid black; background-color:GRAY; color:GRAY; }
 """
 
-class TargetTypes(Enum):
-    TARGET = 1
-    SOURCE = 2
-
-class CellTypes(Enum):
-    UNUSED = 1
-    NAN = 2
-    USED = 3
-    TARGET = 4
-    SOURCE = 5
-
-    def to_type(title:str):
-        if title== "NAN":
-            return CellTypes.NAN
-        elif title == "UNUSED":
-            return CellTypes.UNUSED
-        else:
-            return CellTypes.USED
-
 class Cell:
-    def __init__(self, item:ManifestItem):
+    def __init__(self, item: ManifestItem):
         self.item = item
-        self.type = CellTypes.to_type(item.get_title())
+        self.type = item.get_type() 
         self.label = QtWidgets.QLabel()
         self.label.setAttribute(QtCore.Qt.WA_StyledBackground, True)
         self.targetType = None
@@ -59,13 +33,6 @@ class Cell:
         else:
             self.label.setText(f"{self.item.title}<br>{self.item.weight}")
         
-        # if self.item.title == "UNUSED" or self.item.title == "NAN":
-        #     self.label.setText("UNUSED")
-        # elif len(self.item.title) > 6:
-        #     self.label.setText(self.item.title[:5]+"...")
-        # else:
-        #     self.label.setText(self.item.title)
-    
     def get_display_row(self) -> int:
         return (8 - self.item.get_row())
     
@@ -122,19 +89,6 @@ class Cell:
         self.label.style().polish(self.label)
         self.label.update()
 
-    # def generate_style(self) -> str:
-    #     targetType = self.get_targetType()
-
-    #     # target type takes precedence
-    #     background = self.get_type() if targetType is None else targetType
-
-    #     if self.type == CellTypes.UNUSED:
-    #         background = self.item.get_position()
-        
-    #     style = self.base_stylesheet + StyleBackgroundDict[background]
-    #     # print(style)
-    #     return style
-    
 class ParkCell(Cell):
     def __init__(self, parkLabel:QtWidgets.QLabel):
         self.parkLabel = parkLabel
