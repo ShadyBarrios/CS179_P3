@@ -1,10 +1,11 @@
 from action import Action, ActionTypes
-from state import State
-from utils import manhattan_dist
+from cell import CellTypes
 from coordinate import Coordinate
+from crane_moves import CraneMoves
+from state import State
 
 class Node:
-    def __init__(self, state: State, cost: int=0, dist:int=0, action: Action=None, parent=None, action_type = ActionTypes.FromPark):
+    def __init__(self, state: State, cost: int=0, dist: int=0, action: Action=None, parent=None, action_type = ActionTypes.FromPark):
         self.state = state
         self.cost = cost # g(n)
         self.heuristic = state.calculate_heuristic() # h(n)
@@ -150,6 +151,7 @@ class Node:
     def meets_criteria_b(self) -> bool:
         return self.calculate_criteria_b() < 0
 
+    # think of it as FSM where source moves to target
     def manhattan_dist(self, action:Action, actionType:ActionTypes) -> int:
         grid = self.state.get_grid()
 
@@ -158,7 +160,42 @@ class Node:
         curr_col = action.source.get_col() - 1
         target_row = action.target.get_row() - 1
         target_col = action.target.get_col() - 1
+
+        dist = 0 
+        crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
+
+        moveDown = False
+        afterMoveItem = False
+        moveUpSameRow = False
+        if curr_row != 8:
+            afterMoveItem = (CellTypes.to_type(grid[curr_row][curr_col].get_title()) == CellTypes.USED) and (actionType == ActionTypes.ToItem)
         
-        dist = manhattan_dist(grid, curr_row, curr_col, target_row, target_col, actionType)
+        # print(f"{crane_move} for {curr_row},{curr_col} to {target_row},{target_col}")
+        while True:
+            match(crane_move):
+                # move right
+                case CraneMoves.MoveRight:
+                    curr_col += 1
+                case CraneMoves.MoveLeft:
+                    curr_col -= 1
+                case CraneMoves.MoveDown:
+                    curr_row -= 1
+                    moveDown = True
+                case CraneMoves.MoveUp:
+                    curr_row += 1
+                case CraneMoves.MoveUpSameRow:
+                    curr_row += 1
+                    moveUpSameRow = True # will be nullified later, -1 to climb, -1 to go back down
+                case CraneMoves.AtDest:
+                    break
+            dist += 1
+            crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
+
+        if moveUpSameRow: # takes precedence
+            dist -= 1
+        elif moveDown and afterMoveItem:
+            dist += 1
+
+        dist -= int(dist > 1 and actionType != ActionTypes.MoveItem) # crane hover, so if it moves to target, then just -1 
         return dist
     

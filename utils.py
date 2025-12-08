@@ -38,7 +38,6 @@ def create_grid_from_list(item_list: list[ManifestItem], row_count: int = 8, col
         grid.append(state_row)
     return grid
 
-# think of it as FSM where source moves to target
 def manhattan_dist(grid: list[list[ManifestItem]], curr_row: int, curr_col: int, target_row: int, target_col: int, actionType:ActionTypes):    
     dist = 0 
     crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
@@ -75,7 +74,6 @@ def manhattan_dist(grid: list[list[ManifestItem]], curr_row: int, curr_col: int,
     elif moveDown and afterMoveItem:
         dist += 1
 
-    dist -= int(dist > 1 and actionType != ActionTypes.MoveItem) # crane hover, so if it moves to target, then just -1
     return dist
 
 def source_styling(txt:str) -> str:
