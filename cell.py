@@ -59,13 +59,6 @@ class Cell:
         else:
             self.label.setText(f"{self.item.title}<br>{self.item.weight}")
         
-        # if self.item.title == "UNUSED" or self.item.title == "NAN":
-        #     self.label.setText("UNUSED")
-        # elif len(self.item.title) > 6:
-        #     self.label.setText(self.item.title[:5]+"...")
-        # else:
-        #     self.label.setText(self.item.title)
-    
     def get_display_row(self) -> int:
         return (8 - self.item.get_row())
     
@@ -122,19 +115,6 @@ class Cell:
         self.label.style().polish(self.label)
         self.label.update()
 
-    # def generate_style(self) -> str:
-    #     targetType = self.get_targetType()
-
-    #     # target type takes precedence
-    #     background = self.get_type() if targetType is None else targetType
-
-    #     if self.type == CellTypes.UNUSED:
-    #         background = self.item.get_position()
-        
-    #     style = self.base_stylesheet + StyleBackgroundDict[background]
-    #     # print(style)
-    #     return style
-    
 class ParkCell(Cell):
     def __init__(self, parkLabel:QtWidgets.QLabel):
         self.parkLabel = parkLabel

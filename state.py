@@ -20,6 +20,52 @@ class State:
                 title = f"{item.get_title()}"
                 output += coordinate + ", {" + weight + "}, " + title + "\n" 
         return output
+    
+    # in order for two grid to be not "equal"
+    # they cannot have the same moveable objects in addition to the same objects on the same sides
+    # they can also mirror each other
+    def __eq__(self, rhs):
+        if not isinstance(rhs, State):
+            return False
+        column_equality = self.__compare_weight_columns__(rhs)
+        # crane_equality = self.__compare_cranes__(rhs)
+        # return column_equality and crane_equality
+        return column_equality
+    
+    def __hash__(self) -> int:
+        port_weights, starboard_weights = self.get_side_weight_lists()
+
+        # convert list[list[int]] to list[tuple[int]]
+        port_weights_sorted = sorted([tuple(column) for column in port_weights])
+        starboard_weights_sorted = sorted([tuple(column) for column in starboard_weights])
+
+        # convert to tuple[tuple[int]]
+        port_weights_final = tuple(port_weights_sorted)
+        starboard_weights_final = tuple(starboard_weights_sorted)
+
+        return hash((port_weights_final, starboard_weights_final))
+
+    # compares to see that both grids have the same weight columns on the same sides (or mirrored)
+    def __compare_weight_columns__(self, rhs) -> bool:
+        if not isinstance(rhs, State):
+            return False
+
+        lhs_port_weights, lhs_starboard_weights = self.get_side_weight_lists()
+        rhs_port_weights, rhs_starboard_weights = rhs.get_side_weight_lists()
+
+        lhs_port_weights_sorted, lhs_starboard_weights_sorted = sorted(lhs_port_weights), sorted(lhs_starboard_weights)
+        rhs_port_weights_sorted, rhs_starboard_weights_sorted = sorted(rhs_port_weights), sorted(rhs_starboard_weights)
+        
+        port_equality = (lhs_port_weights_sorted == rhs_port_weights_sorted)
+        starboard_equality = (lhs_starboard_weights_sorted == rhs_starboard_weights_sorted)
+        port_equality_mirrored = (lhs_port_weights_sorted == rhs_starboard_weights_sorted)
+        starboard_equality_mirrored = (lhs_starboard_weights_sorted == rhs_port_weights_sorted)
+
+        equal_columns = port_equality and starboard_equality 
+        equal_columns_mirrored = port_equality_mirrored and starboard_equality_mirrored
+
+
+        return equal_columns or equal_columns_mirrored
 
     def _copy_grid(self) -> list[list[ManifestItem]]:
         grid_copy: list[list[ManifestItem]] = []
@@ -114,21 +160,6 @@ class State:
 
         return port_weights, starboard_weights
     
-    # Get movable items for a specific grid
-    def _get_movable_items(grid: list[list[ManifestItem]]) -> list[ManifestItem]:
-        moveable_items: list[ManifestItem] = []
-        row_count = len(grid)
-        col_count = len(grid[0])
-
-        for row in range(row_count):
-            for col in range(col_count):
-                item = grid[row][col]
-                item_type = CellTypes.to_type(item.get_title())
-                item_above_type = CellTypes.UNUSED if row == 7 else CellTypes.to_type(grid[row+1][col].get_title())
-                if item_type == CellTypes.USED and item_above_type == CellTypes.UNUSED:
-                    moveable_items.append(item)
-        return moveable_items
-    
     def get_open_spots(self) -> list[ManifestItem]:
         open_spots: list[ManifestItem] = []
 
@@ -143,7 +174,17 @@ class State:
         return open_spots
     
     def get_moveable_items(self) -> list[ManifestItem]:
-        return State._get_movable_items(self.grid)
+        moveable_items: list[ManifestItem] = []
+        grid = self.grid()
+
+        for row in range(self.row_count):
+            for col in range(self.col_count):
+                item = grid[row][col]
+                item_type = CellTypes.to_type(item.get_title())
+                item_above_type = CellTypes.UNUSED if row == 7 else CellTypes.to_type(grid[row+1][col].get_title())
+                if item_type == CellTypes.USED and item_above_type == CellTypes.UNUSED:
+                    moveable_items.append(item)
+        return moveable_items
 
     def get_num_used_cells(self) -> int:
         used_count = 0
@@ -194,81 +235,6 @@ class State:
                 if (item.get_title() == "UNUSED" or item.get_title() == "NAN") and item.get_weight() > 0:
                     return False
         return True
-
-    # in order for two grid to be not "equal"
-    # they cannot have the same moveable objects in addition to the same objects on the same sides
-    # they can also mirror each other
-    def __eq__(self, rhs):
-        if not isinstance(rhs, State):
-            return False
-        column_equality = self.__compare_weight_columns__(rhs)
-        # crane_equality = self.__compare_cranes__(rhs)
-        # return column_equality and crane_equality
-        return column_equality
-    
-    def __hash__(self) -> int:
-        port_weights, starboard_weights = self.get_side_weight_lists()
-
-        # convert list[list[int]] to list[tuple[int]]
-        port_weights_sorted = sorted([tuple(column) for column in port_weights])
-        starboard_weights_sorted = sorted([tuple(column) for column in starboard_weights])
-
-        # convert to tuple[tuple[int]]
-        port_weights_final = tuple(port_weights_sorted)
-        starboard_weights_final = tuple(starboard_weights_sorted)
-
-        return hash((port_weights_final, starboard_weights_final))
-
-    # compares to see that both grids have the same weight columns on the same sides (or mirrored)
-    def __compare_weight_columns__(self, rhs) -> bool:
-        if not isinstance(rhs, State):
-            return False
-
-        lhs_port_weights, lhs_starboard_weights = self.get_side_weight_lists()
-        rhs_port_weights, rhs_starboard_weights = rhs.get_side_weight_lists()
-
-        lhs_port_weights_sorted, lhs_starboard_weights_sorted = sorted(lhs_port_weights), sorted(lhs_starboard_weights)
-        rhs_port_weights_sorted, rhs_starboard_weights_sorted = sorted(rhs_port_weights), sorted(rhs_starboard_weights)
-        
-        port_equality = (lhs_port_weights_sorted == rhs_port_weights_sorted)
-        starboard_equality = (lhs_starboard_weights_sorted == rhs_starboard_weights_sorted)
-        port_equality_mirrored = (lhs_port_weights_sorted == rhs_starboard_weights_sorted)
-        starboard_equality_mirrored = (lhs_starboard_weights_sorted == rhs_port_weights_sorted)
-
-        equal_columns = port_equality and starboard_equality 
-        equal_columns_mirrored = port_equality_mirrored and starboard_equality_mirrored
-
-
-        return equal_columns or equal_columns_mirrored
-
-    # # Compares if both grids have the same movable items
-    # # Not needed?
-    # def __compare_movable_items__(self, rhs) -> bool:
-    #     if not isinstance(rhs, State):
-    #         return False
-        
-    #     lhs_port, lhs_starboard = self.get_sides()
-    #     rhs_port, rhs_starboard = rhs.get_sides()
-
-    #     lhs_port_movable = {item for item in State._get_movable_items(lhs_port)}
-    #     lhs_starboard_movable = {item for item in State._get_movable_items(lhs_starboard)}
-    #     rhs_port_movable = {item for item in State._get_movable_items(rhs_port)}
-    #     rhs_starboard_movable = {item for item in State._get_movable_items(rhs_starboard)}
-
-    #     port_equality = (lhs_port_movable == rhs_port_movable)
-    #     starboard_equality = (lhs_starboard_movable == rhs_starboard_movable)
-    #     port_equality_mirrored = (lhs_port_movable == rhs_starboard_movable)
-    #     starboard_equality_mirrored = (lhs_starboard_movable == rhs_port_movable)
-        
-    #     equal_movable = port_equality and starboard_equality
-    #     equal_movable_mirrored = port_equality_mirrored and starboard_equality_mirrored
-
-    #     return equal_movable or equal_movable_mirrored
-    
-    def __compare_cranes__(self, rhs) -> bool:
-        if not isinstance(rhs, State):
-            return False
-        return self.crane == rhs.get_crane()
 
     # calculates all the possible operations from the current state, based on actionType
     def generate_actions(self, actionType:ActionTypes) -> list[Action]:
@@ -329,13 +295,12 @@ class State:
             case ActionTypes.ToPark:
                 return State(new_grid, target_coordinate)
 
-    # criteria b: |Ph - Sh| < =(Sum(Po, So) * 0.10), so expected is |Ph-Sh| >= (Sum(Po, So) * 0.1) therefore |Ph - Sh| - (sum(Po, So) * 10) >= 0
-    # therefore, an admissible heurstic would be |Ph - Sh| - (sum(Po, So) * 10)
-    # however, this could be negative (when goal met) and h(n) must be >= 0, so h(n) = max(0, |Ph - Sh| - (sum(Po, So) * 10))
-    # def calculate_heuristic(self) -> float:
-    #     criteria_b_calc = self.criteria_b()
-    #     return max(0, criteria_b_calc)
-
+    # criteria b: |Ph - Sh| <= (Sum(Po, So) * 0.10), so expected is |Ph-Sh| >= (Sum(Po, So) * 0.1) 
+    # therefore |Ph - Sh| - (sum(Po, So) * 10) >= 0
+    # 1. calculate the deficit between the target weight and the lighter side
+    # - This is the amount of weight that should be moved
+    # - The manhattan distance of the containers that need to be moved is a good analog for minutes
+    # - Distance to the center is a good way to underestimate the manhattan distance for admissibility
     def calculate_heuristic(self) -> int:
         result = 0
         port_side, starboard_side = self.get_sides()

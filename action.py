@@ -12,8 +12,8 @@ class Action:
         self.source = source
         self.target = target
     
-    def copy(self):
-        return Action(self.source.copy(), self.target.copy())
-    
     def __str__(self) -> str:
         return f"Move {self.source.get_coordinate()} to {self.target.get_coordinate()}"
+    
+    def copy(self):
+        return Action(self.source.copy(), self.target.copy())

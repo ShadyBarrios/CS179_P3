@@ -398,7 +398,6 @@ class Ui_MainWindow(object):
 
 
         QMetaObject.connectSlotsByName(MainWindow)
-    # setupUi
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Keogh's Port App by CyberSmiths", None))
@@ -419,5 +418,3 @@ class Ui_MainWindow(object):
         self.FilePickButton.setText(QCoreApplication.translate("MainWindow", u"Choose a file", None))
         self.ErrorLabel.setText(QCoreApplication.translate("MainWindow", u"Error", None))
         self.ErrorRestartButton.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
-    # retranslateUi
-

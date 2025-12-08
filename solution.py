@@ -5,6 +5,13 @@ class Solution:
     def __init__(self, goal_node:Node):
         self.goal_node = goal_node
 
+    def __str__(self) -> str:
+        output = f"Num of moves: {len(self.get_actions())}:\n"
+        for action in self.get_actions():
+            output += f"{action}\n"
+        
+        return output
+
     # returns actions in order
     def get_actions(self) -> list[Action]:
         actions = []
@@ -40,12 +47,4 @@ class Solution:
     
     def get_time_to_execute(self) -> int:
         return self.goal_node.get_cost()
-    
-    def __str__(self) -> str:
-        output = f"Num of moves: {len(self.get_actions())}:\n"
-        for action in self.get_actions():
-            output += f"{action}\n"
-        
-        return output
-
     

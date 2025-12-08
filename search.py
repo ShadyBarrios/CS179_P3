@@ -42,5 +42,5 @@ class Search():
                if child not in explored:
                    frontier.put(child)
 
-        # Minimum is accounted for in 'is_goal_state()' check
+        # Minimum is accounted for in '_goal_test()' check
         return Solution(None)

@@ -19,17 +19,10 @@ class Node:
     def __eq__(self, rhs):
         if not(isinstance(rhs, Node)):
             return False
-
-        comp_states = self.state == rhs.state
-
-        comp_actions_crane_matters = (self.action_type == ActionTypes.MoveItem) and (rhs.action_type == ActionTypes.MoveItem) # both got done moving items
         
-        comp_actions_crane_doesnt_matter = (self.action_type != ActionTypes.MoveItem) and (rhs.action_type != ActionTypes.MoveItem)
-
+        comp_states = self.state == rhs.state
         comp_actions = self.action_type == rhs.action_type
-
-        # return (comp_states and (comp_actions_crane_doesnt_matter or (comp_actions_crane_matters and comp_crane)))
-        return (comp_states and comp_actions)
+        return comp_states and comp_actions
     
     def __hash__(self) -> int:
         actionType = ActionTypes.ToItem if (self.action_type == ActionTypes.FromPark or self.action_type == ActionTypes.ToPark) else self.action_type
@@ -41,11 +34,6 @@ class Node:
             return False
         
         return self.get_total_cost() < rhs.get_total_cost()
-    
-    def set_state(self, state:State):
-        if not isinstance(state, State):
-            return
-        self.state = state
 
     def to_park(self):
         current_state = self.get_state()

@@ -12,12 +12,6 @@ class ManifestItem:
         self.title = "PARK" if self.is_park() else title
         self.position = ItemPosition.PORT if coordinate.get_col() <= 6 else ItemPosition.STARBOARD
 
-    def is_park(self) -> bool:
-        return self.coordinate == Coordinate(9,1)
-    
-    def copy(self):
-        return ManifestItem(self.coordinate.copy(), self.weight, self.title)
-    
     # only the coordinate and weight matter for matching, no difference in state if title is different
     def __eq__(self, rhs) -> int:
         if not isinstance(rhs, ManifestItem):
@@ -26,6 +20,12 @@ class ManifestItem:
     
     def __hash__(self) -> int:
         return hash((self.coordinate, self.weight))
+    
+    def is_park(self) -> bool:
+        return self.coordinate == Coordinate(9,1)
+    
+    def copy(self):
+        return ManifestItem(self.coordinate.copy(), self.weight, self.title)
 
     def get_coordinate(self) -> Coordinate:
         return self.coordinate
