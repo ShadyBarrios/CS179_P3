@@ -59,6 +59,3 @@ class ManifestItem:
         same_col = self.get_coordinate().get_col() == rhs.get_coordinate().get_col()
         row_under = (self.get_coordinate().get_row() == (rhs.get_coordinate().get_row() - 1))
         return (same_col and row_under)
-    
-    def empty_item(coordinate: Coordinate):
-        return ManifestItem(coordinate, 0, "UNUSED")

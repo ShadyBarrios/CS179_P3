@@ -289,7 +289,7 @@ class State:
                 new_grid[target_coordinate.get_row()-1][target_coordinate.get_col()-1] = source
 
                 # update old source coordinate with empty object
-                new_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem.empty_item(source_coordinate)
+                new_grid[source_coordinate.get_row()-1][source_coordinate.get_col()-1] = ManifestItem(source_coordinate, 0, "UNUSED")
                 
                 return State(new_grid, target_coordinate)
             case ActionTypes.ToPark:
