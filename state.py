@@ -1,6 +1,7 @@
-from action import Action, ActionTypes
+from action import Action
 from cell import CellTypes
 from coordinate import Coordinate
+from enums import ActionTypes, CellTypes
 from manifest import ManifestItem
 
 class State:
@@ -134,7 +135,7 @@ class State:
         for row in range(self.row_count):
             for col in range(self.col_count):
                 item = self.grid[row][col]
-                if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                if item.get_type() == CellTypes.USED:
                     weights.append(item.get_weight())
 
         return weights
@@ -148,7 +149,7 @@ class State:
             starboard_col_weights = []
             for row in range(self.row_count):
                 item = self.grid[row][col]
-                if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                if item.get_type() == CellTypes.USED:
                     if col < 6:
                         port_col_weights.append(item.get_weight())
                     else:
@@ -166,8 +167,8 @@ class State:
         for row in range(self.row_count):
             for col in range(self.col_count):
                 item = self.grid[row][col]
-                item_type = CellTypes.to_type(item.get_title())
-                item_below_type = CellTypes.USED if row == 0 else CellTypes.to_type(self.grid[row-1][col].get_title())
+                item_type = item.get_type()
+                item_below_type = CellTypes.USED if row == 0 else self.grid[row-1][col].get_type()
                 if item_type == CellTypes.UNUSED and item_below_type != CellTypes.UNUSED:
                     open_spots.append(item)
         # print([str(item.coordinate) for item in open_spots])
@@ -175,13 +176,12 @@ class State:
     
     def get_moveable_items(self) -> list[ManifestItem]:
         moveable_items: list[ManifestItem] = []
-        grid = self.grid()
 
         for row in range(self.row_count):
             for col in range(self.col_count):
-                item = grid[row][col]
-                item_type = CellTypes.to_type(item.get_title())
-                item_above_type = CellTypes.UNUSED if row == 7 else CellTypes.to_type(grid[row+1][col].get_title())
+                item = self.grid[row][col]
+                item_type = item.get_type()
+                item_above_type = CellTypes.UNUSED if row == 7 else self.grid[row+1][col].get_type()
                 if item_type == CellTypes.USED and item_above_type == CellTypes.UNUSED:
                     moveable_items.append(item)
         return moveable_items
@@ -190,7 +190,7 @@ class State:
         used_count = 0
         for row in self.grid:
             for item in row:
-                used_count += int(CellTypes.to_type(item.get_title()) == CellTypes.USED)
+                used_count += int(item.get_type() == CellTypes.USED)
         
         return used_count
 
@@ -203,11 +203,11 @@ class State:
         for row in port_side:
             row.reverse()
             for item in row:
-                port_side_NANs.append(CellTypes.to_type(item.get_title()) == CellTypes.NAN)
+                port_side_NANs.append(item.get_type() == CellTypes.NAN)
 
         for row in starboard_side:
             for item in row:
-                starboard_side_NANs.append(CellTypes.to_type(item.get_title()) == CellTypes.NAN)
+                starboard_side_NANs.append(item.get_type() == CellTypes.NAN)
 
         return port_side_NANs == starboard_side_NANs
 
@@ -218,8 +218,8 @@ class State:
 
         for row in range(1,row_count):
             for col in range(col_count):
-                if CellTypes.to_type(self.grid[row][col].get_title()) != CellTypes.UNUSED:
-                    if CellTypes.to_type(self.grid[row-1][col].get_title()) == CellTypes.UNUSED:
+                if self.grid[row][col].get_type() != CellTypes.UNUSED:
+                    if self.grid[row-1][col].get_type() == CellTypes.UNUSED:
                         return False
 
         return True
@@ -315,7 +315,7 @@ class State:
             deficit = balance_mass - starboard_side_weight
             for row in port_side:
                 for item in row:
-                    if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                    if item.get_type() == CellTypes.USED:
                         side_containers.append((item.get_col(), item.get_weight()))
 
             # Sort all containers on the side by weight in descending order
@@ -331,7 +331,7 @@ class State:
             deficit = balance_mass - port_side_weight
             for row in starboard_side:
                 for item in row:
-                    if CellTypes.to_type(item.get_title()) == CellTypes.USED:
+                    if item.get_type() == CellTypes.USED:
                         side_containers.append((item.get_col(), item.get_weight()))
             
             # Sort all containers on the side by weight in descending order

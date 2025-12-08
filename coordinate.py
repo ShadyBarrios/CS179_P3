@@ -1,4 +1,3 @@
-
 class Coordinate:
     def __init__(self, row: int, col: int):
         self.loc = (row, col)

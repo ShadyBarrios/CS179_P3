@@ -1,15 +1,8 @@
-from enum import Enum
 from PySide6 import QtWidgets, QtCore
-from manifest import ManifestItem, ItemPosition
-from coordinate import Coordinate
 
-# CellTypes.NAN: "background-color:BLACK; color:BLACK;",
-# CellTypes.UNUSED: "background-color:WHITE; color:WHITE;",
-# CellTypes.USED: "background-color:rgba(255, 165, 0, 0.5); color:BLACK;",
-# TargetTypes.TARGET: "background-color:rgba(255, 0, 0, 0.5); color:BLACK;",
-# TargetTypes.SOURCE: "background-color:rgba(60, 179, 133, 0.5); color:BLACK;",
-# ItemPosition.PORT: "background-color:WHITE; color:WHITE;",
-# ItemPosition.STARBOARD: "background-color:GRAY; color:GRAY;"
+from coordinate import Coordinate
+from enums import CellTypes, TargetTypes
+from manifest import ManifestItem, ItemPosition
 
 global_stylesheet = """
 QLabel[cls="NAN"] { padding-top:17px; padding-bottom:17px; padding-left:10px; padding-right:10px; border: 2px solid black; background-color:BLACK; color:BLACK; }
@@ -21,29 +14,10 @@ QLabel[cls="STARBOARD"] { padding-top:17px; padding-bottom:17px; padding-left:10
 QLabel[cls="PARK"] { border: 2px solid black; background-color:GRAY; color:GRAY; }
 """
 
-class TargetTypes(Enum):
-    TARGET = 1
-    SOURCE = 2
-
-class CellTypes(Enum):
-    UNUSED = 1
-    NAN = 2
-    USED = 3
-    TARGET = 4
-    SOURCE = 5
-
-    def to_type(title:str):
-        if title== "NAN":
-            return CellTypes.NAN
-        elif title == "UNUSED":
-            return CellTypes.UNUSED
-        else:
-            return CellTypes.USED
-
 class Cell:
-    def __init__(self, item:ManifestItem):
+    def __init__(self, item: ManifestItem):
         self.item = item
-        self.type = CellTypes.to_type(item.get_title())
+        self.type = item.get_type() 
         self.label = QtWidgets.QLabel()
         self.label.setAttribute(QtCore.Qt.WA_StyledBackground, True)
         self.targetType = None

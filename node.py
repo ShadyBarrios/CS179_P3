@@ -1,7 +1,7 @@
-from action import Action, ActionTypes
+from action import Action
 from cell import CellTypes
 from coordinate import Coordinate
-from crane_moves import CraneMoves
+from enums import ActionTypes, CellTypes, CraneMoves
 from state import State
 
 class Node:
@@ -36,7 +36,7 @@ class Node:
         return self.get_total_cost() < rhs.get_total_cost()
 
     def to_park(self):
-        current_state = self.get_state()
+        current_state = self.state
 
         if current_state.crane == Coordinate(9,1): # already at park
             return self
@@ -70,9 +70,6 @@ class Node:
     def get_cost(self) -> int:
         return self.cost
     
-    def add_cost(self, cost:int):
-        self.cost += cost
-
     def get_heuristic(self) -> float:
         return self.heuristic
 
@@ -139,8 +136,43 @@ class Node:
     def meets_criteria_b(self) -> bool:
         return self.calculate_criteria_b() < 0
 
+    def calculate_move(self, curr_row: int, curr_col: int, target_row: int, target_col: int, action_type: ActionTypes):
+        grid = self.state.get_grid()
+        # print(f"{curr_row} {curr_col} | {target_row} {target_col}")
+        if (((curr_row == target_row) ) and (curr_col == target_col)):
+            return CraneMoves.AtDest
+        
+        if (curr_row > target_row) and (curr_col == target_col): # crane is above
+            return CraneMoves.MoveDown
+        
+        if (curr_row == 8): # in park, but park is not destination
+            return CraneMoves.MoveDown
+        
+        if (target_row == 8) and (curr_col == target_col): # crane is below park
+            return CraneMoves.MoveUp
+        
+        if (curr_col < target_col): # crane is to left of item
+            item_right = grid[curr_row][curr_col+1].get_type()
+            if item_right != CellTypes.UNUSED:
+                if curr_row == target_row and action_type == ActionTypes.ToItem:
+                    return CraneMoves.MoveUpSameRow # shouldn't count this climb
+                else:
+                    return CraneMoves.MoveUp
+            else:
+                return CraneMoves.MoveRight # nothing in the way continue moving right
+        
+        if (curr_col > target_col): # crane is to right of item
+            item_left = grid[curr_row][curr_col-1].get_type()
+            if item_left != CellTypes.UNUSED:
+                if curr_row == target_row and action_type == ActionTypes.ToItem:
+                    return CraneMoves.MoveUpSameRow # shouldn't count this climb
+                else:
+                    return CraneMoves.MoveUp
+            else:
+                return CraneMoves.MoveLeft # nothing in the way continue moving left
+        
     # think of it as FSM where source moves to target
-    def manhattan_dist(self, action:Action, actionType:ActionTypes) -> int:
+    def manhattan_dist(self, action: Action, action_type: ActionTypes) -> int:
         grid = self.state.get_grid()
 
         # - 1 for idx
@@ -150,13 +182,13 @@ class Node:
         target_col = action.target.get_col() - 1
 
         dist = 0 
-        crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
+        crane_move = self.calculate_move(curr_row, curr_col, target_row, target_col, action_type)
 
         moveDown = False
         afterMoveItem = False
         moveUpSameRow = False
         if curr_row != 8:
-            afterMoveItem = (CellTypes.to_type(grid[curr_row][curr_col].get_title()) == CellTypes.USED) and (actionType == ActionTypes.ToItem)
+            afterMoveItem = (grid[curr_row][curr_col].get_type() == CellTypes.USED) and (action_type == ActionTypes.ToItem)
         
         # print(f"{crane_move} for {curr_row},{curr_col} to {target_row},{target_col}")
         while True:
@@ -177,13 +209,13 @@ class Node:
                 case CraneMoves.AtDest:
                     break
             dist += 1
-            crane_move = CraneMoves.calculate_move(grid, curr_row, curr_col, target_row, target_col, actionType)
+            crane_move = self.calculate_move(curr_row, curr_col, target_row, target_col, action_type)
 
         if moveUpSameRow: # takes precedence
             dist -= 1
         elif moveDown and afterMoveItem:
             dist += 1
 
-        dist -= int(dist > 1 and actionType != ActionTypes.MoveItem) # crane hover, so if it moves to target, then just -1 
+        dist -= int(dist > 1 and action_type != ActionTypes.MoveItem) # crane hover, so if it moves to target, then just -1 
         return dist
     

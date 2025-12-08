@@ -1,5 +1,5 @@
 from coordinate import Coordinate
-from enum import Enum
+from enums import Enum, CellTypes
 
 class ItemPosition(Enum):
     PORT = 1
@@ -44,6 +44,9 @@ class ManifestItem:
 
     def get_position(self) -> ItemPosition:
         return self.position
+
+    def get_type(self) -> CellTypes:
+        return CellTypes.to_type(self.title)
 
     def set_coordinate(self, coordinate: Coordinate):
         self.coordinate = coordinate

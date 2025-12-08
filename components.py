@@ -1,30 +1,18 @@
 from main_window import *
 from utils import *
 from grid_display import GridDisplay
-from enum import Enum
-from file_io import ParseErrorTypes, parse_file
+from enums import ActionTypes, Pages, ParseErrorTypes
 from state import State
 from node import Node
 from solution import Solution
 from search import Search
 from PySide6 import QtCore
 from coordinate import Coordinate
-from action import Action, ActionTypes
+from action import Action
 from time import localtime as current_time
 from os import makedirs as makedir
 from shutil import copy2
 
-class States(Enum):
-    init_grid = 1
-    show_init = 2
-    end = 3
-
-class Pages(Enum):
-    ShipGridPage = 0
-    CommentPage = 1
-    FinishedPage = 2
-    FilePickPage = 3
-    ErrorPage = 4
 
 class SearchWorker(QtCore.QObject):
     solution = QtCore.Signal(object)
