@@ -13,6 +13,11 @@ class TestManifestItem():
     unused = ManifestItem(Coordinate(1, 9), 0, "UNUSED")
     nan = ManifestItem(Coordinate(1, 10), 0, "NAN")
 
+    def test_str(self):
+        assert str(self.a) == "[01,01], {000001}, Item 1"
+        assert str(self.unused) == "[01,09], {000000}, UNUSED"
+        assert str(self.nan) == "[01,10], {000000}, NAN"
+
     def test_eq(self):
         assert self.a == self.b
         assert self.b == self.a
@@ -23,6 +28,10 @@ class TestManifestItem():
         assert self.a != self.d
         assert self.b != self.d
         assert self.c != self.d
+
+        # comparison with wrong type returns false
+        assert self.a != 5
+        assert self.a.get_coordinate() != (1, 1)
 
     def test_copy(self):
         new_manifest_item = self.a.copy()
@@ -111,3 +120,6 @@ class TestManifestItem():
         assert self.a.directly_below(above_a)
         assert not self.a.directly_below(above_above_a)
         assert above_a.directly_below(above_above_a)
+        
+        # comparison with wrong type returns false
+        assert not self.a.directly_below(5)
