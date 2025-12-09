@@ -189,14 +189,22 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
         self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 425, 141))
-        self.PreviousMovesLabel = QLabel(self.scrollAreaWidgetContents)
+        self.verticalLayoutWidget_5 = QWidget(self.scrollAreaWidgetContents)
+        self.verticalLayoutWidget_5.setObjectName(u"verticalLayoutWidget_5")
+        self.verticalLayoutWidget_5.setGeometry(QRect(10, 10, 401, 121))
+        self.verticalLayout_6 = QVBoxLayout(self.verticalLayoutWidget_5)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.PreviousMovesLabel = QLabel(self.verticalLayoutWidget_5)
         self.PreviousMovesLabel.setObjectName(u"PreviousMovesLabel")
-        self.PreviousMovesLabel.setGeometry(QRect(10, 10, 411, 131))
         sizePolicy1.setHeightForWidth(self.PreviousMovesLabel.sizePolicy().hasHeightForWidth())
         self.PreviousMovesLabel.setSizePolicy(sizePolicy1)
         font = QFont()
-        font.setPointSize(8)
+        font.setPointSize(7)
         self.PreviousMovesLabel.setFont(font)
+
+        self.verticalLayout_6.addWidget(self.PreviousMovesLabel)
+
         self.PreviousMovesScrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.verticalLayout_5.addWidget(self.PreviousMovesScrollArea)
@@ -398,6 +406,7 @@ class Ui_MainWindow(object):
 
 
         QMetaObject.connectSlotsByName(MainWindow)
+    # setupUi
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Keogh's Port App by CyberSmiths", None))
@@ -418,3 +427,5 @@ class Ui_MainWindow(object):
         self.FilePickButton.setText(QCoreApplication.translate("MainWindow", u"Choose a file", None))
         self.ErrorLabel.setText(QCoreApplication.translate("MainWindow", u"Error", None))
         self.ErrorRestartButton.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
+    # retranslateUi
+

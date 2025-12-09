@@ -89,3 +89,4 @@ CS179_P3.pyproject.user
 examples/
 output/
 log_backup/
+tests/

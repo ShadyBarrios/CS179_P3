@@ -29,9 +29,11 @@ class Cell:
         if self.item.title == "UNUSED" or self.item.title == "NAN":
             self.label.setText("UNUSED")
         elif len(self.item.title) > 6:
-            self.label.setText(f"{self.item.title[:5]}...<br>{self.item.weight}")
+            # self.label.setText(f"{self.item.title[:5]}...<br>{self.item.weight}") # to see weights underneath
+            self.label.setText(f"{self.item.title[:5]}...")
         else:
-            self.label.setText(f"{self.item.title}<br>{self.item.weight}")
+            # self.label.setText(f"{self.item.title}<br>{self.item.weight}") # to see weights underneath
+            self.label.setText(f"{self.item.title}") 
         
     def get_display_row(self) -> int:
         return (8 - self.item.get_row())
