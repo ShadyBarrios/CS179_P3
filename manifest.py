@@ -9,6 +9,9 @@ class ManifestItem:
         self.title = "PARK" if self.is_park() else title
         self.position = ItemPosition.PORT if coordinate.get_col() <= 6 else ItemPosition.STARBOARD
 
+    def __str__(self) -> str:
+        return str(self.coordinate) + ", {" + f"{self.weight:06d}" + "}, " + self.title
+    
     # only the coordinate and weight matter for matching, no difference in state if title is different
     def __eq__(self, rhs) -> int:
         if not isinstance(rhs, ManifestItem):

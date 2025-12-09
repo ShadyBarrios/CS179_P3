@@ -13,14 +13,10 @@ class State:
     
     def __str__(self) -> str:
         output = ""
-        grid = self.grid
-        for row in grid:
+        for row in self.grid:
             for item in row:
-                coordinate = f"{item.get_coordinate()}"
-                weight = f"{item.get_weight():06d}"
-                title = f"{item.get_title()}"
-                output += coordinate + ", {" + weight + "}, " + title + "\n" 
-        return output
+                output += str(item) + "\n"
+        return output[:-1]
     
     # in order for two grid to be not "equal"
     # they cannot have the same moveable objects in addition to the same objects on the same sides
