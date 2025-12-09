@@ -316,29 +316,38 @@
                 <height>141</height>
                </rect>
               </property>
-              <widget class="QLabel" name="PreviousMovesLabel">
+              <widget class="QWidget" name="verticalLayoutWidget_5">
                <property name="geometry">
                 <rect>
                  <x>10</x>
-                 <y>10</y>
-                 <width>411</width>
-                 <height>131</height>
+                 <y>0</y>
+                 <width>401</width>
+                 <height>141</height>
                 </rect>
                </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+                </property>
+                <item>
+                 <widget class="QLabel" name="PreviousMovesLabel">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>7</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </widget>
             </widget>

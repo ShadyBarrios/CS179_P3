@@ -137,15 +137,23 @@ class Node:
         return self.calculate_criteria_b() < 0
 
     def calculate_move(self, curr_row: int, curr_col: int, target_row: int, target_col: int, action_type: ActionTypes):
+        if curr_row == 8:
+            if curr_col < target_col:
+                return CraneMoves.MoveRight
+            elif curr_col > target_col:
+                return CraneMoves.MoveLeft
+            elif curr_row == target_row: # and curr_col == target_col
+                return CraneMoves.AtDest
+            else: # curr_col == target_col
+                return CraneMoves.MoveDown
+
+            
         grid = self.state.get_grid()
         # print(f"{curr_row} {curr_col} | {target_row} {target_col}")
         if (((curr_row == target_row) ) and (curr_col == target_col)):
             return CraneMoves.AtDest
         
         if (curr_row > target_row) and (curr_col == target_col): # crane is above
-            return CraneMoves.MoveDown
-        
-        if (curr_row == 8): # in park, but park is not destination
             return CraneMoves.MoveDown
         
         if (target_row == 8) and (curr_col == target_col): # crane is below park
@@ -216,6 +224,6 @@ class Node:
         elif moveDown and afterMoveItem:
             dist += 1
 
-        dist -= int(dist > 1 and action_type != ActionTypes.MoveItem) # crane hover, so if it moves to target, then just -1 
+        dist -= int(dist > 0 and action_type != ActionTypes.MoveItem) # crane hover, so if it moves to target, then just -1 
         return dist
     
